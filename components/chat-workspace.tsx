@@ -271,7 +271,7 @@ export function ChatWorkspace() {
   }
 
   const releaseDetail = health.status === "ready"
-    ? `${health.table_count ?? "—"} tables · cutoff ${health.data_cutoff ?? "not reported"}`
+    ? `${health.table_count ?? "—"} ${health.table_count === 1 ? "table" : "tables"} · cutoff ${health.data_cutoff ?? "not reported"}`
     : health.status === "unavailable" ? "Research service is offline" : "Full release verification is in progress";
 
   return (

@@ -29,3 +29,9 @@ The English answer began "The released records contain the following school meal
 - Two runs of the same question can differ in wording because the model phrases the answer.
 - The first request after a restart is slower until the index file is in the page cache. The service now reads the file at startup.
 - This record covers one deployment on one day. It does not measure retrieval quality.
+
+## Interface check with real clicks (live site, same day)
+
+A Playwright run against the public site typed a Portuguese question, waited for the cited answer, clicked **New research**, asked an English question, and checked the history list (two conversations, titled by their first question). It then reopened the first conversation, reloaded the page (history persisted), and loaded the phone-width layout with no horizontal overflow.
+
+Screenshots (desktop empty state, desktop answer, desktop history, mobile, tablet) are in this folder: `2026-09-30-chat-*.png`. The local suite (18 tests, desktop and mobile, including axe checks) also covers history creation, reopening, persistence across reload, and deletion.

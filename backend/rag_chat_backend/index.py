@@ -58,11 +58,13 @@ _STOP = set("a o as os de do da dos das em no na nos nas que qual quais quantos 
             "the of in on what which how many are is there for with about and to any me show list mostre liste "
             "existem existe tem ha sao licitacoes licitacao contratacoes contratacao compras compra registros registro "
             "publicados publicado publicadas record records released release procurement procurements purchases "
-            "purchase exist included include listed notices notice bids bid tender tenders corpus dados data".split())
+            "purchase exist included include listed notices notice bids bid tender tenders corpus dados data "
+            "following give find information about records list lists".split())
 
 # Deterministic English to Portuguese glossary for the procurement domain. The corpus text is Portuguese,
 # so an English question must be bridged before lexical retrieval.
 GLOSSARY = {
+    "service": ["servico", "servicos"], "services": ["servico", "servicos"],
     "school": ["escola", "escolar", "escolares"], "schools": ["escola", "escolar", "escolares"],
     "meal": ["merenda", "refeicao", "alimentacao"], "meals": ["merenda", "refeicao", "alimentacao"],
     "lunch": ["merenda", "refeicao"], "food": ["alimento", "alimentos", "alimentacao", "genero"],

@@ -16,7 +16,8 @@ MAX_BODY = 16 * 1024
 def make_engine() -> Engine:
     model = None
     if os.environ.get("QWEN_BASE_URL"):
-        model = QwenClient(os.environ["QWEN_BASE_URL"], os.environ.get("QWEN_API_KEY", ""), os.environ.get("QWEN_MODEL", "qwen"))
+        model = QwenClient(os.environ["QWEN_BASE_URL"], os.environ.get("QWEN_API_KEY", ""), os.environ.get("QWEN_MODEL", "qwen"),
+                           extra_headers=json.loads(os.environ.get("QWEN_EXTRA_HEADERS") or "{}"))
     return Engine(db=open_index(Path(os.environ["RAG_INDEX_PATH"])), profile=os.environ.get("RAG_PROFILE", "PNCP corpus profile"),
                   release=os.environ.get("RAG_RELEASE", "v1"), dataset_slug=os.environ["RAG_DATASET_SLUG"],
                   manifest_sha256=os.environ.get("RAG_MANIFEST_SHA256"), model=model)

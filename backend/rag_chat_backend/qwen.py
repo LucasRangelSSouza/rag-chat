@@ -11,12 +11,19 @@ SYSTEM = ("You answer research questions about Brazilian public procurement (PNC
 
 
 class QwenClient:
-    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 45.0):
+    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 45.0, extra_headers: dict | None = None):
         self.base_url, self.api_key, self.model, self.timeout = base_url.rstrip("/"), api_key, model, timeout
+        self.extra_headers = dict(extra_headers or {})
+
+    def _headers(self, json_body: bool = False) -> dict:
+        headers = {"Authorization": f"Bearer {self.api_key}", **self.extra_headers}
+        if json_body:
+            headers["content-type"] = "application/json"
+        return headers
 
     def ready(self) -> bool:
         try:
-            req = urllib.request.Request(f"{self.base_url}/models", headers={"Authorization": f"Bearer {self.api_key}"})
+            req = urllib.request.Request(f"{self.base_url}/models", headers=self._headers())
             with urllib.request.urlopen(req, timeout=8) as resp:
                 return resp.status == 200
         except Exception:
@@ -28,7 +35,7 @@ class QwenClient:
                 "messages": [{"role": "system", "content": SYSTEM},
                              {"role": "user", "content": "Context:\n" + "\n".join(context) + f"\n\nQuestion: {question}"}]}
         req = urllib.request.Request(f"{self.base_url}/chat/completions", data=json.dumps(body).encode(),
-                                     headers={"content-type": "application/json", "Authorization": f"Bearer {self.api_key}"})
+                                     headers=self._headers(json_body=True))
         for _ in range(2):
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:

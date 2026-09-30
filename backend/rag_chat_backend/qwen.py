@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 import time
 import urllib.request
 
@@ -22,11 +23,21 @@ class QwenClient:
             headers["content-type"] = "application/json"
         return headers
 
-    def available(self, ttl: float = 60.0) -> bool:
-        """Cached readiness probe, so requests skip a dead upstream instead of waiting for its timeout."""
+    def available(self, ttl: float = 30.0) -> bool:
+        """Last known readiness, refreshed in the background so health checks and requests never wait on the upstream."""
         now = time.monotonic()
-        if now - getattr(self, "_probe_at", -1e9) > ttl:
-            self._probe_ok, self._probe_at = self.ready(), now
+        if not hasattr(self, "_probe_ok"):
+            self._probe_ok, self._probe_at, self._probing = False, -1e9, False
+        if now - self._probe_at > ttl and not self._probing:
+            self._probing = True
+
+            def refresh() -> None:
+                try:
+                    self._probe_ok = self.ready()
+                finally:
+                    self._probe_at, self._probing = time.monotonic(), False
+
+            threading.Thread(target=refresh, daemon=True).start()
         return self._probe_ok
 
     def ready(self) -> bool:

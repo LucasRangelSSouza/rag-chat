@@ -59,6 +59,7 @@ def validate_sql(sql: str, allowed: set[str]) -> str:
 SYSTEM = ("You write one PostgreSQL SELECT statement that answers the user's question over the tables described below. "
           "Rules: one statement, SELECT only, use only the listed tables and columns, qualify tables with their schema, "
           "aggregate and ORDER BY when the question asks for a ranking or total, and add LIMIT 50 at most. "
+          "Use the statistic the question names: PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY col) for a median, AVG only for an average. "
           "Answer with JSON only: {\"sql\": \"...\", \"explanation\": \"one sentence about what the query measures\"}. "
           "If the tables cannot answer the question, answer {\"sql\": null, \"explanation\": \"why\"}.")
 

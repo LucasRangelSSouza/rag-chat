@@ -1,0 +1,12 @@
+[project]
+name = "rag-chat-backend"
+version = "0.1.0"
+description = "Bounded, cited RAG backend for RAG Chat with pluggable corpus profiles."
+requires-python = ">=3.10"
+dependencies = ["pyarrow>=15"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

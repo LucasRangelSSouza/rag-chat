@@ -1,0 +1,31 @@
+export type Citation = {
+  chunk_id?: string;
+  document_id?: string;
+  title: string;
+  source_uri: string;
+  license_note?: string;
+  dataset?: {
+    slug: string;
+    version: number;
+    manifest_sha256?: string;
+  };
+  record_ids?: string[];
+  score?: number;
+};
+
+export type Answer = {
+  status: "answered" | "abstained" | "refused";
+  answer: string;
+  citations: Citation[];
+  safety_reason?: string | null;
+};
+
+export type CorpusHealth = {
+  status: "ready" | "pending" | "unavailable";
+  corpus_name: string;
+  release_version?: string;
+  data_cutoff?: string;
+  table_count?: number;
+  record_count?: number;
+  model_status?: "ready" | "extractive" | "unavailable";
+};

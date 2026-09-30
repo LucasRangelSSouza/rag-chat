@@ -17,7 +17,7 @@ GENERAL_SYSTEM = ("You are a concise assistant. Answer in the same language as t
 
 
 class QwenClient:
-    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 18.0, extra_headers: dict | None = None):
+    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 45.0, extra_headers: dict | None = None):
         self.base_url, self.api_key, self.model, self.timeout = base_url.rstrip("/"), api_key, model, timeout
         self.extra_headers = dict(extra_headers or {})
 

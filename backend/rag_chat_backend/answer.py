@@ -102,7 +102,10 @@ class Engine:
                                                          objeto=(h.get("text") or "-")[:220]) for i, (_, h) in enumerate(merged)]
         citations = [self._citation(c, h, i + 1) for i, (c, h) in enumerate(merged)]
         for corpus in sql_bases:
-            result = corpus.store.ask(question, self.model) if self._model_ready() else {"error": "the SQL agent needs the model"}
+            try:
+                result = corpus.store.ask(question, self.model) if self._model_ready() else {"error": "the SQL agent needs the model"}
+            except Exception:  # a failing database or model must end in an abstention, not a server error
+                result = {"error": "the SQL agent failed"}
             if "error" in result or not result.get("rows"):
                 continue
             tag = len(tagged) + 1

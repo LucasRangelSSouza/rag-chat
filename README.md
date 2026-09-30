@@ -67,6 +67,11 @@ A corpus profile pins a Kaggle dataset slug, its version, the release manifest h
 - Answers describe what the released records say. They are not legal advice, an eligibility assessment, or a supplier recommendation, and the corpus does not cover all national procurement.
 - The public demo accepts one question at a time, no uploads, no model selection, and no tools.
 
+## Article and evidence
+
+- Article source: [docs/articles/cited-rag-chat-versioned-corpus.md](docs/articles/cited-rag-chat-versioned-corpus.md), with its [claim-to-evidence map](docs/articles/claim-map.md).
+- Live acceptance record: [docs/evidence/2026-09-30-live-acceptance.md](docs/evidence/2026-09-30-live-acceptance.md).
+
 ## Related repositories
 
 - [brazil-public-data-map](https://github.com/LucasRangelSSouza/brazil-public-data-map): source registry and Kaggle release tooling

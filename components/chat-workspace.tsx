@@ -336,6 +336,11 @@ export function ChatWorkspace() {
                 </div>
               </form>
               <p className="composer-disclaimer">Research support only. Check cited records before relying on an answer.</p>
+              {health.model_status === "ready" ? (
+                <p className="composer-disclaimer">
+                  Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant.
+                </p>
+              ) : null}
             </div>
           </section>
 
@@ -369,6 +374,8 @@ export function ChatWorkspace() {
             <a href="https://github.com/LucasRangelSSouza/rag-chat" target="_blank" rel="noreferrer">Interface repository</a>
             <span aria-hidden="true">·</span>
             <a href="https://github.com/LucasRangelSSouza/qwen-abliterated-api" target="_blank" rel="noreferrer">Model case</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://www.kaggle.com/lucasrangelss/datasets" target="_blank" rel="noreferrer">Kaggle catalogue</a>
           </span>
         </footer>
       </main>

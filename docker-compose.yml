@@ -1,0 +1,29 @@
+# Local reproduction: interface + backend. The index is built once from the pinned semantic Parquet
+# (see README) and mounted read-only. Set QWEN_BASE_URL / QWEN_API_KEY only to enable model wording.
+services:
+  backend:
+    build: ./backend
+    environment:
+      RAG_INDEX_PATH: /data/index.db
+      RAG_PROFILE: ${RAG_PROFILE:-PNCP corpus profile}
+      RAG_DATASET_SLUG: ${RAG_DATASET_SLUG:?set the pinned Kaggle dataset owner/slug}
+      RAG_RELEASE: ${RAG_RELEASE:-v1}
+      RAG_MANIFEST_SHA256: ${RAG_MANIFEST_SHA256:-}
+      QWEN_BASE_URL: ${QWEN_BASE_URL:-}
+      QWEN_API_KEY: ${QWEN_API_KEY:-}
+      QWEN_MODEL: ${QWEN_MODEL:-qwen}
+    volumes:
+      - ./data:/data:ro
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    expose: ["8080"]
+  web:
+    build: .
+    environment:
+      RAG_CHAT_BACKEND_URL: http://backend:8080
+    depends_on: [backend]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ports: ["127.0.0.1:3000:3000"]

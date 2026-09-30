@@ -24,7 +24,7 @@ class Engine:
         meta = read_meta(self.db)
         model_status = "extractive"
         if self.model is not None:
-            model_status = "ready" if self.model.ready() else "extractive"
+            model_status = "ready" if getattr(self.model, "available", self.model.ready)() else "extractive"
         return {"status": "ready", "corpus_name": self.profile, "release_version": self.release,
                 "data_cutoff": meta.get("data_cutoff"), "table_count": meta.get("table_count"),
                 "record_count": meta.get("record_count"), "model_status": model_status}
@@ -62,7 +62,7 @@ class Engine:
         tagged = [f"[C{i + 1}] {line}" for i, line in enumerate(lines)]
         citations = [self._citation(h, i + 1) for i, h in enumerate(hits)]
         text = None
-        if self.model is not None:
+        if self.model is not None and getattr(self.model, "available", lambda: True)():
             text = self.model.complete(question, tagged)
         if text and text != "NO_ANSWER":
             used = {int(n) for n in CITE.findall(text)}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 import urllib.request
 
 SYSTEM = ("You answer research questions about Brazilian public procurement (PNCP) records. Use ONLY the numbered "
@@ -21,10 +22,17 @@ class QwenClient:
             headers["content-type"] = "application/json"
         return headers
 
+    def available(self, ttl: float = 60.0) -> bool:
+        """Cached readiness probe, so requests skip a dead upstream instead of waiting for its timeout."""
+        now = time.monotonic()
+        if now - getattr(self, "_probe_at", -1e9) > ttl:
+            self._probe_ok, self._probe_at = self.ready(), now
+        return self._probe_ok
+
     def ready(self) -> bool:
         try:
             req = urllib.request.Request(f"{self.base_url}/models", headers=self._headers())
-            with urllib.request.urlopen(req, timeout=8) as resp:
+            with urllib.request.urlopen(req, timeout=4) as resp:
                 return resp.status == 200
         except Exception:
             return False

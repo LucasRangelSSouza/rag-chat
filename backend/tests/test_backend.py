@@ -69,3 +69,14 @@ def test_model_citations_must_be_returned_chunks(engine):
     engine.model = Good()
     out = engine.answer("merenda escolar")
     assert out["answer"].startswith("Há merenda") and len(out["citations"]) == 1
+
+
+def test_english_question_reaches_portuguese_records_via_glossary(engine):
+    out = engine.answer("Which school meal procurements are in the released records?")
+    assert out["status"] == "answered" and out["citations"][0]["record_ids"] == ["1-1-1/2026"]
+    assert out["answer"].startswith("Found")
+
+
+def test_terms_must_all_match_so_unrelated_questions_abstain(engine):
+    assert engine.answer("Qual a receita do bolo de chocolate perfeito?")["status"] == "abstained"
+    assert engine.answer("What is the capital of France and who won the World Cup?")["status"] == "abstained"

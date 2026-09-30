@@ -56,20 +56,60 @@ def read_meta(db: sqlite3.Connection) -> dict:
 
 _STOP = set("a o as os de do da dos das em no na nos nas que qual quais quantos quantas para por com um uma sobre "
             "the of in on what which how many are is there for with about and to any me show list mostre liste "
-            "existem tem ha sao licitacoes contratacoes compras procurements purchases exist".split())
+            "existem existe tem ha sao licitacoes licitacao contratacoes contratacao compras compra registros registro "
+            "publicados publicado publicadas record records released release procurement procurements purchases "
+            "purchase exist included include listed notices notice bids bid tender tenders corpus dados data".split())
+
+# Deterministic English to Portuguese glossary for the procurement domain. The corpus text is Portuguese,
+# so an English question must be bridged before lexical retrieval.
+GLOSSARY = {
+    "school": ["escola", "escolar", "escolares"], "schools": ["escola", "escolar", "escolares"],
+    "meal": ["merenda", "refeicao", "alimentacao"], "meals": ["merenda", "refeicao", "alimentacao"],
+    "lunch": ["merenda", "refeicao"], "food": ["alimento", "alimentos", "alimentacao", "genero"],
+    "transport": ["transporte"], "transportation": ["transporte"], "bus": ["onibus"], "vehicle": ["veiculo", "veiculos"],
+    "vehicles": ["veiculo", "veiculos"], "cleaning": ["limpeza"], "construction": ["obra", "obras", "construcao"],
+    "works": ["obra", "obras"], "medicine": ["medicamento", "medicamentos"], "medicines": ["medicamento", "medicamentos"],
+    "drugs": ["medicamento", "medicamentos"], "computer": ["computador", "computadores"], "computers": ["computador", "computadores"],
+    "book": ["livro", "livros"], "books": ["livro", "livros"], "uniform": ["uniforme", "uniformes"], "uniforms": ["uniforme", "uniformes"],
+    "equipment": ["equipamento", "equipamentos"], "fuel": ["combustivel", "combustiveis"], "health": ["saude"],
+    "teacher": ["professor", "docente"], "teachers": ["professor", "docente"], "furniture": ["mobiliario", "moveis"],
+    "software": ["software", "sistema"], "internet": ["internet"], "paving": ["pavimentacao", "asfalto"],
+    "security": ["seguranca", "vigilancia"], "maintenance": ["manutencao"], "training": ["capacitacao", "treinamento"],
+    "stationery": ["papelaria", "expediente"], "supplies": ["material", "materiais", "insumos"], "material": ["material", "materiais"],
+    "hospital": ["hospital", "hospitalar"], "ambulance": ["ambulancia"], "tires": ["pneu", "pneus"], "printer": ["impressora"],
+    "printing": ["impressao", "grafica"], "energy": ["energia"], "water": ["agua"], "garbage": ["lixo", "residuos"], "waste": ["residuos", "lixo"],
+    "sports": ["esportivo", "esportivos", "esporte"], "music": ["musical", "musica"], "event": ["evento", "eventos"], "events": ["evento", "eventos"],
+}
 
 
-def _terms(question: str) -> list[str]:
-    folded = unicodedata.normalize("NFKD", question).encode("ascii", "ignore").decode().lower()
-    return [t for t in re.findall(r"[a-z0-9]{3,}", folded) if t not in _STOP][:8]
+def _fold(text: str) -> str:
+    return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+
+
+def _groups(question: str) -> list[list[str]]:
+    """One alternatives-group per meaningful question term; the query ANDs the groups."""
+    seen, groups = set(), []
+    for term in re.findall(r"[a-z0-9]{3,}", _fold(question)):
+        if term in _STOP or term in seen:
+            continue
+        seen.add(term)
+        alts = GLOSSARY.get(term, [term])
+        groups.append(list(dict.fromkeys([term, *alts])) if term in GLOSSARY else alts)
+    return groups[:5]
+
+
+def _match(groups: list[list[str]]) -> str:
+    return " AND ".join("(" + " OR ".join(f'"{alt}"' for alt in group) + ")" for group in groups)
 
 
 def search(db: sqlite3.Connection, question: str, k: int = 5) -> tuple[int, list[dict]]:
-    terms = _terms(question)
-    if not terms:
+    groups = _groups(question)
+    if not groups:
         return 0, []
-    match = " OR ".join(f'"{t}"' for t in terms)
-    count = db.execute("SELECT count(*) FROM fts WHERE fts MATCH ?", (match,)).fetchone()[0]
+    match = _match(groups)
+    count = db.execute("SELECT count(*) FROM (SELECT rowid FROM fts WHERE fts MATCH ? LIMIT 100000)", (match,)).fetchone()[0]
+    if not count:
+        return 0, []
     hits = db.execute(
         "SELECT r.*, bm25(fts) AS score FROM fts JOIN records r ON r.rowid = fts.rowid "
         "WHERE fts MATCH ? ORDER BY score LIMIT ?", (match, k)).fetchall()

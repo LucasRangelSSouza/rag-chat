@@ -11,7 +11,7 @@ SYSTEM = ("You answer research questions about Brazilian public procurement (PNC
 
 
 class QwenClient:
-    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 45.0, extra_headers: dict | None = None):
+    def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 18.0, extra_headers: dict | None = None):
         self.base_url, self.api_key, self.model, self.timeout = base_url.rstrip("/"), api_key, model, timeout
         self.extra_headers = dict(extra_headers or {})
 
@@ -36,7 +36,7 @@ class QwenClient:
                              {"role": "user", "content": "Context:\n" + "\n".join(context) + f"\n\nQuestion: {question}"}]}
         req = urllib.request.Request(f"{self.base_url}/chat/completions", data=json.dumps(body).encode(),
                                      headers=self._headers(json_body=True))
-        for _ in range(2):
+        for _ in range(1):
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     text = json.load(resp)["choices"][0]["message"]["content"] or ""

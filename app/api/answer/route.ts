@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ question: body.question, corpora }),
       cache: "no-store",
-      signal: AbortSignal.timeout(25_000),
+      signal: AbortSignal.timeout(100_000),
     });
     if (!response.ok) return NextResponse.json({ error: "The research service could not answer right now." }, { status: 503 });
     const answer = safeAnswer(await response.json());

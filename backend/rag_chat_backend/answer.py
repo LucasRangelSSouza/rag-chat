@@ -10,6 +10,7 @@ from .language import MESSAGES, detect_language
 
 CITE = re.compile(r"\[C(\d+)\]")
 MAX_CORPORA = 5
+MAX_RESULT_ROWS = 25
 
 
 @dataclass
@@ -87,32 +88,46 @@ class Engine:
         selected = [self.corpora[c] for c in dict.fromkeys(corpus_ids or []) if c in self.corpora][:MAX_CORPORA]
         if not selected:
             return self._ungrounded(question, msg)
+        text_bases = [c for c in selected if not getattr(c.store, "is_sql", False)]
+        sql_bases = [c for c in selected if getattr(c.store, "is_sql", False)]
         per_corpus, total = [], 0
-        for corpus in selected:
+        for corpus in text_bases:
             count, hits = search(corpus.store, question, k=5)
             total += count
             if hits:
                 per_corpus.append((corpus, hits))
         merged = _merge(per_corpus, 5)
-        if not merged:
+        tagged = [f"[C{i + 1}] " + msg["record"].format(id=h["id"], orgao=h.get("org") or "-", municipio=h.get("municipality") or "-",
+                                                         uf=h.get("uf") or "-", modalidade=h.get("kind") or "-",
+                                                         objeto=(h.get("text") or "-")[:220]) for i, (_, h) in enumerate(merged)]
+        citations = [self._citation(c, h, i + 1) for i, (c, h) in enumerate(merged)]
+        for corpus in sql_bases:
+            result = corpus.store.ask(question, self.model) if self._model_ready() else {"error": "the SQL agent needs the model"}
+            if "error" in result or not result.get("rows"):
+                continue
+            tag = len(tagged) + 1
+            for row in result["rows"][:10]:
+                tagged.append(f"[C{tag}] " + "; ".join(f"{col}={val}" for col, val in zip(result["columns"], row)))
+            first = tag
+            citations.append({"chunk_id": f"C{first}:sql", "document_id": corpus.id, "title": f"SQL over {corpus.label}"[:240],
+                              "source_uri": f"https://www.kaggle.com/datasets/{corpus.dataset_slug}", "record_ids": [corpus.id],
+                              "dataset": {"slug": corpus.dataset_slug, "version": 1},
+                              "query": {"sql": result["sql"], "columns": result["columns"], "rows": result["rows"][:MAX_RESULT_ROWS],
+                                        "explanation": result.get("explanation", "")}})
+        if not tagged:
             return {"status": "abstained", "answer": msg["abstain"], "citations": [], "safety_reason": None, "grounded": True}
         names = ", ".join(c.label for c in selected)
         cutoffs = sorted({str(read_meta(c.store).get("data_cutoff", "?")) for c in selected})
         cov = msg["coverage"].format(profile=names, release=", ".join(sorted({c.release for c in selected})), cutoff=", ".join(cutoffs))
-        lines = [msg["record"].format(id=h["id"], orgao=h.get("org") or "-", municipio=h.get("municipality") or "-",
-                                      uf=h.get("uf") or "-", modalidade=h.get("kind") or "-",
-                                      objeto=(h.get("text") or "-")[:220]) for _, h in merged]
-        tagged = [f"[C{i + 1}] {line}" for i, line in enumerate(lines)]
-        citations = [self._citation(c, h, i + 1) for i, (c, h) in enumerate(merged)]
         text = None
         if self._model_ready():
             text = self.model.complete(question, tagged)
         if text and text != "NO_ANSWER":
             used = {int(n) for n in CITE.findall(text)}
-            if used and used <= set(range(1, len(merged) + 1)):
-                cited = [citations[i - 1] for i in sorted(used)]
+            if used and used <= set(range(1, len(tagged) + 1)):
+                cited = [c for c in citations if int(c["chunk_id"].split(":")[0][1:]) in used or "query" in c]
                 return {"status": "answered", "answer": f"{text}\n\n{cov}", "citations": cited, "safety_reason": None, "grounded": True}
-        body = msg["found"].format(n=total, k=len(merged)) + "\n" + "\n".join(tagged) + "\n\n" + cov
+        body = msg["found"].format(n=total or len(tagged), k=len(tagged)) + "\n" + "\n".join(tagged) + "\n\n" + cov
         return {"status": "answered", "answer": body, "citations": citations, "safety_reason": None, "grounded": True}
 
     def _ungrounded(self, question: str, msg: dict) -> dict:

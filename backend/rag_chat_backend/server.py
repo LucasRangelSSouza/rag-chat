@@ -44,8 +44,14 @@ def make_engine() -> Engine:
         corpora[base_id] = Corpus(base_id, base_label, PgStore(dsn, os.environ.get("RAG_TABLE", "pncp.obt_pncp_editais_semantico"), cutoff),
                                   slug, release, manifest)
         for extra in json.loads(os.environ.get("RAG_EXTRA_CORPORA") or "[]"):
-            corpora[extra["id"]] = Corpus(extra["id"], extra["label"], PgStore(dsn, extra["table"], extra.get("cutoff", cutoff)),
-                                          extra["dataset_slug"], extra.get("release", "v1"), extra.get("manifest_sha256"))
+            if extra.get("type") == "sql":
+                from .sql_agent import SqlStore
+
+                store = SqlStore(os.environ["RAG_SQL_DATABASE_URL"], extra["tables"], extra.get("cutoff", "n/a"))
+            else:
+                store = PgStore(dsn, extra["table"], extra.get("cutoff", cutoff))
+            corpora[extra["id"]] = Corpus(extra["id"], extra["label"], store, extra["dataset_slug"], extra.get("release", "v1"),
+                                          extra.get("manifest_sha256"))
     else:
         path = Path(os.environ["RAG_INDEX_PATH"])
         warm_index(path)

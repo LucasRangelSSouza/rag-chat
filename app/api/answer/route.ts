@@ -5,6 +5,15 @@ export const dynamic = "force-dynamic";
 const MAX_QUESTION_CHARS = 1000;
 const MAX_BODY_BYTES = 16 * 1024;
 
+function safeQuery(value: unknown): Citation["query"] | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const q = value as Record<string, unknown>;
+  if (typeof q.sql !== "string" || !Array.isArray(q.columns) || !Array.isArray(q.rows)) return undefined;
+  const columns = q.columns.filter((c): c is string => typeof c === "string").slice(0, 30).map((c) => c.slice(0, 60));
+  const rows = q.rows.slice(0, 25).map((row) => (Array.isArray(row) ? row.slice(0, 30).map((cell) => (cell === null || ["string", "number", "boolean"].includes(typeof cell) ? (typeof cell === "string" ? cell.slice(0, 200) : cell) : null)) : [])) as (string | number | boolean | null)[][];
+  return { sql: q.sql.slice(0, 4000), columns, rows, ...(typeof q.explanation === "string" ? { explanation: q.explanation.slice(0, 300) } : {}) };
+}
+
 function safeCitation(value: unknown): Citation | null {
   if (!value || typeof value !== "object") return null;
   const citation = value as Record<string, unknown>;
@@ -22,6 +31,7 @@ function safeCitation(value: unknown): Citation | null {
     ...(typeof citation.license_note === "string" ? { license_note: citation.license_note.slice(0, 500) } : {}),
     ...(slug && version ? { dataset: { slug, version, ...(typeof dataset?.manifest_sha256 === "string" && /^[a-f0-9]{64}$/i.test(dataset.manifest_sha256) ? { manifest_sha256: dataset.manifest_sha256.toLowerCase() } : {}) } } : {}),
     ...(Array.isArray(citation.record_ids) ? { record_ids: citation.record_ids.filter((id): id is string => typeof id === "string").slice(0, 8).map((id) => id.slice(0, 160)) } : {}),
+    ...(safeQuery(citation.query) ? { query: safeQuery(citation.query) } : {}),
     ...(typeof citation.score === "number" && Number.isFinite(citation.score) ? { score: citation.score } : {}),
   };
 }

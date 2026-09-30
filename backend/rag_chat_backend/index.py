@@ -51,7 +51,7 @@ def open_index(db_path: Path) -> sqlite3.Connection:
 
 
 def read_meta(db) -> dict:
-    if getattr(db, "is_pg", False):
+    if hasattr(db, "meta"):
         return db.meta()
     return {k: json.loads(v) for k, v in db.execute("SELECT k, v FROM meta")}
 

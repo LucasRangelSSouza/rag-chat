@@ -6,8 +6,8 @@ requires-python = ">=3.10"
 dependencies = ["pyarrow>=15"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
-postgres = ["psycopg[binary]>=3.2"]
+dev = ["pytest>=8", "sqlglot>=25"]
+postgres = ["psycopg[binary]>=3.2", "sqlglot>=25", "google-auth>=2.30", "requests>=2.31"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

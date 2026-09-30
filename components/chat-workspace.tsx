@@ -94,6 +94,19 @@ function CitationCard({ citation, index, compact = false }: { citation: Citation
         </p>
         {item.rows.length > 0 ? <p className="citation-card__rows">Records: {item.rows.join(", ")}{(citation.record_ids?.length ?? 0) > item.rows.length ? " …" : ""}</p> : null}
         {item.chunk ? <p className="citation-card__rows">Evidence passage <code>{item.chunk}</code></p> : null}
+        {citation.query ? (
+          <details className="sql-evidence">
+            <summary>SQL and result ({citation.query.rows.length} rows)</summary>
+            {citation.query.explanation ? <p className="sql-evidence__note">{citation.query.explanation}</p> : null}
+            <pre className="sql-evidence__sql">{citation.query.sql}</pre>
+            <div className="sql-evidence__scroll">
+              <table>
+                <thead><tr>{citation.query.columns.map((column) => <th key={column} scope="col">{column}</th>)}</tr></thead>
+                <tbody>{citation.query.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((value, cellIndex) => <td key={cellIndex}>{value === null ? "" : String(value)}</td>)}</tr>)}</tbody>
+              </table>
+            </div>
+          </details>
+        ) : null}
         {item.href ? (
           <a className="citation-card__link" href={item.href} target="_blank" rel="noreferrer">
             Open source <ExternalLink size={13} aria-hidden />

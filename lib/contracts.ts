@@ -10,6 +10,7 @@ export type Citation = {
     manifest_sha256?: string;
   };
   record_ids?: string[];
+  query?: { sql: string; columns: string[]; rows: (string | number | boolean | null)[][]; explanation?: string };
   score?: number;
 };
 

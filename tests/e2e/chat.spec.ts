@@ -9,19 +9,23 @@ const readyHealth = {
   table_count: 47,
   record_count: 125000,
   model_status: "ready",
+  corpora: [
+    { id: "pncp", label: "PNCP procurement", release_version: "v1", data_cutoff: "2026-07-31", record_count: 125000 },
+    { id: "siope", label: "SIOPE education finance", release_version: "v1", data_cutoff: "2025-12-31", record_count: 27830 },
+  ],
 };
 
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/health", (route) => route.fulfill({ json: readyHealth }));
 });
 
-test("shows a bounded research workspace while the release is pending", async ({ page }) => {
+test("shows a bounded research workspace while the release is pending", async ({ page, isMobile }) => {
   await page.route("**/api/health", (route) => route.fulfill({ json: {
     status: "pending", corpus_name: "PNCP", model_status: "unavailable",
   } }));
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Ask the record/i })).toBeVisible();
-  await expect(page.getByText("Release pending").first()).toBeVisible();
+  if (!isMobile) await expect(page.getByText("Release pending").first()).toBeVisible();
   await expect(page.getByRole("textbox", { name: /Ask a question/i })).toBeDisabled();
   await expect(page.getByText("The public chat opens after the complete catalogue is pinned and verified.")).toBeVisible();
 });
@@ -45,11 +49,8 @@ test("sends a question and shows exact source provenance", async ({ page, isMobi
   await expect(page.getByRole("link", { name: /Open source/i }).first()).toHaveAttribute(
     "href", "https://www.kaggle.com/datasets/lucasrangelss/pncp-semantic-editais-semantico/versions/3",
   );
-  if (isMobile) {
-    await expect(page.locator(".inline-citations")).toBeVisible();
-  } else {
-    await expect(page.getByRole("heading", { name: "Sources" })).toBeVisible();
-  }
+  await expect(page.locator(".inline-citations").first()).toBeVisible();
+  void isMobile;
 });
 
 test("keeps the answer in the visitor's question language", async ({ page }) => {
@@ -170,4 +171,41 @@ test("conversation history: new research, reopen, persist across reload, delete"
   await history.getByRole("button", { name: /Delete conversation: Second question about transport/ }).click();
   await expect(history.getByRole("button", { name: "Second question about transport", exact: true })).toHaveCount(0);
   await expect(history.getByRole("button", { name: "First question about school meals", exact: true })).toBeVisible();
+});
+
+
+test("research bases: checkboxes choose what is searched, none means an unsourced answer", async ({ page, isMobile }) => {
+  const bodies: Array<{ question: string; corpora: string[] }> = [];
+  await page.route("**/api/answer", (route) => {
+    bodies.push(route.request().postDataJSON());
+    return route.fulfill({ json: { status: "answered", answer: "ok", citations: [], grounded: bodies.at(-1)!.corpora.length > 0 } });
+  });
+  await page.goto("/");
+  if (isMobile) await page.getByRole("button", { name: "Open navigation" }).click();
+  const pncp = page.getByRole("checkbox", { name: /PNCP procurement/ });
+  const siope = page.getByRole("checkbox", { name: /SIOPE education finance/ });
+  await expect(pncp).toBeChecked();
+  await expect(siope).not.toBeChecked();
+  await siope.check({ force: true });
+  await expect(page.getByText("Answers cite records from all selected bases.")).toBeVisible();
+  if (isMobile) await page.locator(".sidebar__close").click();
+  const box = page.getByRole("textbox", { name: /Ask a question/i });
+  await box.fill("first");
+  await box.press("Enter");
+  await expect(page.getByText("ok").first()).toBeVisible();
+  expect(bodies[0].corpora.sort()).toEqual(["pncp", "siope"]);
+
+  if (isMobile) await page.getByRole("button", { name: "Open navigation" }).click();
+  await pncp.uncheck({ force: true });
+  await siope.uncheck({ force: true });
+  await expect(page.getByText("No base selected: answers are not sourced.")).toBeVisible();
+  if (isMobile) await page.locator(".sidebar__close").click();
+  await box.fill("second");
+  await box.press("Enter");
+  await expect(page.getByText("No sources used")).toBeVisible();
+  expect(bodies[1].corpora).toEqual([]);
+
+  await page.reload();
+  if (isMobile) await page.getByRole("button", { name: "Open navigation" }).click();
+  await expect(page.getByRole("checkbox", { name: /PNCP procurement/ })).not.toBeChecked();  // the empty choice persists
 });

@@ -37,6 +37,7 @@ function safeAnswer(value: unknown): Answer | null {
     answer: candidate.answer.slice(0, 12_000),
     citations,
     safety_reason: typeof candidate.safety_reason === "string" ? candidate.safety_reason.slice(0, 80) : null,
+    ...(typeof candidate.grounded === "boolean" ? { grounded: candidate.grounded } : {}),
   };
 }
 
@@ -64,8 +65,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Send a valid JSON question." }, { status: 400 });
   }
   const body = payload as Record<string, unknown>;
-  if (Object.keys(body).some((key) => key !== "question")) {
-    return NextResponse.json({ error: "Only the question field is accepted." }, { status: 400 });
+  if (Object.keys(body).some((key) => key !== "question" && key !== "corpora")) {
+    return NextResponse.json({ error: "Only the question and corpora fields are accepted." }, { status: 400 });
+  }
+  const corpora = body.corpora === undefined ? [] : body.corpora;
+  if (!Array.isArray(corpora) || corpora.length > 5 || corpora.some((id) => typeof id !== "string" || !/^[a-z0-9_-]{1,40}$/.test(id))) {
+    return NextResponse.json({ error: "Choose up to five research bases." }, { status: 400 });
   }
   if (typeof body.question !== "string" || !body.question.trim() || body.question.length > MAX_QUESTION_CHARS) {
     return NextResponse.json({ error: "Enter a question of up to 1,000 characters." }, { status: 400 });
@@ -76,7 +81,7 @@ export async function POST(request: Request) {
     const response = await fetch(`${backend.replace(/\/$/, "")}/v1/answer`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ question: body.question }),
+      body: JSON.stringify({ question: body.question, corpora }),
       cache: "no-store",
       signal: AbortSignal.timeout(25_000),
     });

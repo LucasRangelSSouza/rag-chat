@@ -7,7 +7,7 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from .answer import Engine
+from .answer import Corpus, Engine
 from .index import open_index
 from .qwen import QwenClient
 
@@ -24,21 +24,37 @@ def warm_index(path: Path) -> None:
 
 
 def make_engine() -> Engine:
+    """Build the research bases from the environment.
+
+    Postgres mode (RAG_DATABASE_URL): the first base is RAG_TABLE; extra bases come from
+    RAG_EXTRA_CORPORA, a JSON list of {id, label, table, dataset_slug, release, cutoff}.
+    SQLite mode (RAG_INDEX_PATH): a single base, kept as a fallback.
+    """
+    corpora: dict[str, Corpus] = {}
+    slug = os.environ["RAG_DATASET_SLUG"]
+    release = os.environ.get("RAG_RELEASE", "v1")
+    manifest = os.environ.get("RAG_MANIFEST_SHA256")
+    base_id = os.environ.get("RAG_BASE_ID", "pncp")
+    base_label = os.environ.get("RAG_PROFILE", "PNCP procurement")
     if os.environ.get("RAG_DATABASE_URL"):
         from .pg_store import PgStore
 
-        store = PgStore(os.environ["RAG_DATABASE_URL"], os.environ.get("RAG_TABLE", "pncp.obt_pncp_editais_semantico"),
-                        os.environ.get("RAG_CUTOFF", "2026-07-31"))
+        dsn = os.environ["RAG_DATABASE_URL"]
+        cutoff = os.environ.get("RAG_CUTOFF", "2026-07-31")
+        corpora[base_id] = Corpus(base_id, base_label, PgStore(dsn, os.environ.get("RAG_TABLE", "pncp.obt_pncp_editais_semantico"), cutoff),
+                                  slug, release, manifest)
+        for extra in json.loads(os.environ.get("RAG_EXTRA_CORPORA") or "[]"):
+            corpora[extra["id"]] = Corpus(extra["id"], extra["label"], PgStore(dsn, extra["table"], extra.get("cutoff", cutoff)),
+                                          extra["dataset_slug"], extra.get("release", "v1"), extra.get("manifest_sha256"))
     else:
-        warm_index(Path(os.environ["RAG_INDEX_PATH"]))
-        store = open_index(Path(os.environ["RAG_INDEX_PATH"]))
+        path = Path(os.environ["RAG_INDEX_PATH"])
+        warm_index(path)
+        corpora[base_id] = Corpus(base_id, base_label, open_index(path), slug, release, manifest)
     model = None
     if os.environ.get("QWEN_BASE_URL"):
         model = QwenClient(os.environ["QWEN_BASE_URL"], os.environ.get("QWEN_API_KEY", ""), os.environ.get("QWEN_MODEL", "qwen"),
                            extra_headers=json.loads(os.environ.get("QWEN_EXTRA_HEADERS") or "{}"))
-    return Engine(db=store, profile=os.environ.get("RAG_PROFILE", "PNCP corpus profile"),
-                  release=os.environ.get("RAG_RELEASE", "v1"), dataset_slug=os.environ["RAG_DATASET_SLUG"],
-                  manifest_sha256=os.environ.get("RAG_MANIFEST_SHA256"), model=model)
+    return Engine(corpora=corpora, model=model)
 
 
 def handler(engine: Engine):
@@ -65,10 +81,12 @@ def handler(engine: Engine):
             try:
                 body = json.loads(self.rfile.read(length))
                 question = body["question"]
-                assert isinstance(question, str) and set(body) == {"question"}
+                corpora = body.get("corpora", [])
+                assert isinstance(question, str) and set(body) <= {"question", "corpora"}
+                assert isinstance(corpora, list) and len(corpora) <= 5 and all(isinstance(c, str) and len(c) <= 40 for c in corpora)
             except Exception:
                 return self._send(400, {"error": "invalid request"})
-            self._send(200, engine.answer(question))
+            self._send(200, engine.answer(question, corpora))
 
         def log_message(self, *args):
             pass

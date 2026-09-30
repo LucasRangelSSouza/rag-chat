@@ -22,6 +22,7 @@ export async function GET() {
       ...(typeof payload.data_cutoff === "string" ? { data_cutoff: payload.data_cutoff } : {}),
       ...(Number.isInteger(payload.table_count) ? { table_count: payload.table_count } : {}),
       ...(Number.isInteger(payload.record_count) ? { record_count: payload.record_count } : {}),
+      ...(Array.isArray(payload.corpora) ? { corpora: payload.corpora.slice(0, 8).filter((c: unknown) => c && typeof c === "object").map((c: Record<string, unknown>) => ({ id: String(c.id).slice(0, 40), label: String(c.label).slice(0, 80), ...(typeof c.release_version === "string" ? { release_version: c.release_version } : {}), ...(typeof c.data_cutoff === "string" ? { data_cutoff: c.data_cutoff } : {}), ...(Number.isInteger(c.record_count) ? { record_count: c.record_count as number } : {}) })) } : {}),
       model_status: ["ready", "extractive", "unavailable"].includes(payload.model_status) ? payload.model_status : "unavailable",
     });
   } catch {

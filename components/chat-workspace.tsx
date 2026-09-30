@@ -27,6 +27,7 @@ type ChatMessage = {
   role: "user" | "assistant";
   text: string;
   citations?: Citation[];
+  grounded?: boolean;
   status?: "loading" | "answered" | "abstained" | "refused" | "error";
 };
 
@@ -106,6 +107,7 @@ function CitationCard({ citation, index, compact = false }: { citation: Citation
 
 type Conversation = { id: string; title: string; updatedAt: number; messages: ChatMessage[] };
 const STORAGE_KEY = "rag-chat.conversations.v1";
+const BASES_KEY = "rag-chat.bases.v1";
 const MAX_CONVERSATIONS = 30;
 
 function readHistory(): Conversation[] {
@@ -135,7 +137,8 @@ export function ChatWorkspace() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sourcesOpen, setSourcesOpen] = useState(true);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [basesReady, setBasesReady] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -163,6 +166,33 @@ export function ChatWorkspace() {
     setHistory(readHistory());
     setActiveId(crypto.randomUUID());
   }, []);
+
+  // Research bases: restore the visitor's choice; the first base is selected on a first visit.
+  useEffect(() => {
+    const available = (health.corpora ?? []).map((base) => base.id);
+    if (!available.length || basesReady) return;
+    let stored: string[] | null = null;
+    try {
+      const raw = window.localStorage.getItem(BASES_KEY);
+      stored = raw ? JSON.parse(raw) : null;
+    } catch {
+      stored = null;
+    }
+    setSelected(Array.isArray(stored) ? stored.filter((id) => available.includes(id)) : [available[0]]);
+    setBasesReady(true);
+  }, [health.corpora, basesReady]);
+
+  function toggleBase(id: string) {
+    setSelected((current) => {
+      const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id].slice(0, 5);
+      try {
+        window.localStorage.setItem(BASES_KEY, JSON.stringify(next));
+      } catch {
+        /* the choice then lasts for this visit only */
+      }
+      return next;
+    });
+  }
 
   useEffect(() => {
     const settled = messages.filter((message) => message.status !== "loading");
@@ -193,10 +223,6 @@ export function ChatWorkspace() {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages]);
 
-  const citations = useMemo(
-    () => [...messages].reverse().find((message) => message.role === "assistant" && message.citations?.length)?.citations ?? [],
-    [messages],
-  );
 
   async function ask(text: string) {
     const prompt = text.trim();
@@ -211,13 +237,13 @@ export function ChatWorkspace() {
       const response = await fetch("/api/answer", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: prompt }),
+        body: JSON.stringify({ question: prompt, corpora: selected }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(typeof payload.error === "string" ? payload.error : "The research service is unavailable.");
       const answer = payload as Answer;
       setMessages((current) => current.map((message) => message.id === responseId
-        ? { ...message, text: answer.answer, citations: answer.citations, status: answer.status }
+        ? { ...message, text: answer.answer, citations: answer.citations, status: answer.status, grounded: answer.grounded }
         : message));
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : "The research service is unavailable. Try again shortly.";
@@ -312,24 +338,25 @@ export function ChatWorkspace() {
         </div>
 
         <div className="sidebar__corpus">
-          <p className="nav-label">ACTIVE CORPUS</p>
-          <div className="corpus-card">
-            <div className="corpus-card__icon"><Database size={17} aria-hidden /></div>
-            <div className="corpus-card__copy">
-              <strong>PNCP public data</strong>
-              <span>{health.release_version ? `Release ${health.release_version}` : "First corpus profile"}</span>
-            </div>
-            <ChevronDown size={15} aria-hidden className="corpus-card__chevron" />
-            <div className="corpus-card__status"><CorpusBadge health={health} /></div>
-          </div>
-          <p className="sidebar__coverage">{releaseDetail}</p>
+          <p className="nav-label">RESEARCH BASES</p>
+          <fieldset className="bases">
+            <legend className="sr-only">Research bases to search</legend>
+            {(health.corpora ?? []).map((base) => (
+              <label key={base.id} className={`base${selected.includes(base.id) ? " base--on" : ""}`}>
+                <input type="checkbox" checked={selected.includes(base.id)} onChange={() => toggleBase(base.id)} />
+                <span className="base__box" aria-hidden="true"><Check size={12} /></span>
+                <span className="base__copy">
+                  <strong>{base.label}</strong>
+                  <small>{base.record_count ? `${base.record_count.toLocaleString("en-US")} records` : "Records"} · through {base.data_cutoff ?? "n/a"}</small>
+                </span>
+              </label>
+            ))}
+            {health.status !== "ready" ? <p className="bases__note">{health.status === "unavailable" ? "Research service is offline" : "Loading bases…"}</p> : null}
+          </fieldset>
+          <p className="bases__hint">{selected.length === 0 ? "No base selected: answers are not sourced." : selected.length === 1 ? "Answers cite records from this base." : "Answers cite records from all selected bases."}</p>
         </div>
 
         <div className="sidebar__bottom">
-          <div className="research-contract">
-            <ShieldCheck size={17} aria-hidden />
-            <div><strong>Research contract</strong><span>Answers need source records. Unsupported questions receive an abstention.</span></div>
-          </div>
           <a className="portfolio-link" href="https://github.com/LucasRangelSSouza" target="_blank" rel="noreferrer">
             <span className="portfolio-link__avatar">LR</span>
             <span><strong>Lucas Rangel</strong><small>Portfolio demonstration</small></span>
@@ -360,11 +387,6 @@ export function ChatWorkspace() {
                   <div className="welcome__eyebrow"><span className="welcome__eyebrow-mark"><BookOpen size={14} aria-hidden /></span> PUBLIC PROCUREMENT RESEARCH</div>
                   <h1>Ask the record.<br /><span>Follow the evidence.</span></h1>
                   <p className="welcome__intro">Explore a versioned PNCP release through a cited research interface. Answers follow your question's language and link back to the records used.</p>
-                  <div className="welcome__release">
-                    <div className="welcome__release-icon"><Database size={17} aria-hidden /></div>
-                    <div><strong>PNCP corpus profile</strong><span>{releaseDetail}</span></div>
-                    <CorpusBadge health={health} />
-                  </div>
                   <div className="prompt-section">
                     <div className="prompt-section__heading"><span>START WITH A QUESTION</span><span>Examples</span></div>
                     <div className="prompt-list">
@@ -383,7 +405,7 @@ export function ChatWorkspace() {
                     <article key={message.id} className={`message message--${message.role}${message.status ? ` message--${message.status}` : ""}`}>
                       {message.role === "assistant" ? <span className="message__avatar" aria-hidden="true">R</span> : null}
                       <div className="message__content">
-                        {message.role === "assistant" ? <div className="message__byline"><strong>RAG Chat</strong><span>{message.status === "loading" ? "Searching" : message.status === "answered" ? "Cited response" : message.status === "abstained" ? "Insufficient evidence" : message.status === "refused" ? "Request declined" : message.status === "error" ? "Service unavailable" : "Response"}</span></div> : null}
+                        {message.role === "assistant" ? <div className="message__byline"><strong>RAG Chat</strong><span>{message.status === "loading" ? "Searching" : message.status === "answered" ? (message.grounded === false ? "No sources used" : "Cited response") : message.status === "abstained" ? "Insufficient evidence" : message.status === "refused" ? "Request declined" : message.status === "error" ? "Service unavailable" : "Response"}</span></div> : null}
                         {message.status === "loading" ? <div className="thinking-line"><span className="thinking-dots" aria-hidden="true"><i /><i /><i /></span>{message.text}</div> : null}
                         {message.status === "error" ? <div className="message__error"><CircleAlert size={16} aria-hidden />{message.text}</div> : null}
                         {message.status !== "loading" && message.status !== "error" ? <p className="message__text">{message.text}</p> : null}
@@ -432,28 +454,6 @@ export function ChatWorkspace() {
             </div>
           </section>
 
-          <aside className={`evidence-panel${sourcesOpen ? "" : " evidence-panel--collapsed"}`} aria-label="Evidence and corpus details">
-            <div className="evidence-panel__header">
-              <div><p className="evidence-panel__eyebrow">RESEARCH CONTEXT</p><h2>{citations.length ? "Sources" : "Corpus details"}</h2></div>
-              <button className="icon-button evidence-panel__toggle" aria-label={sourcesOpen ? "Collapse evidence panel" : "Expand evidence panel"} aria-expanded={sourcesOpen} onClick={() => setSourcesOpen(!sourcesOpen)}><ArrowLeft size={16} aria-hidden /></button>
-            </div>
-            <div className="evidence-panel__body">
-              {citations.length ? <>
-                <p className="evidence-panel__lead">Records used in the latest answer. Open the dataset to inspect its release files and source manifest.</p>
-                <div className="evidence-panel__list">{citations.map((citation, index) => <CitationCard key={`${citation.chunk_id ?? citation.source_uri}-${index}`} citation={citation} index={index} />)}</div>
-              </> : <>
-                <div className="evidence-empty"><div className="evidence-empty__icon"><FileSearch size={20} aria-hidden /></div><strong>Evidence stays in view</strong><p>When a response cites records, the dataset, release version, and record identifiers will appear here.</p></div>
-                <div className="evidence-facts">
-                  <p className="nav-label">RELEASE SNAPSHOT</p>
-                  <div><span>Status</span><CorpusBadge health={health} /></div>
-                  <div><span>Corpus</span><strong>PNCP public data</strong></div>
-                  <div><span>Cutoff</span><strong>{health.data_cutoff ?? "Pending verification"}</strong></div>
-                  <div><span>Tables</span><strong>{health.table_count ?? "Pending"}</strong></div>
-                </div>
-              </>}
-              <div className="evidence-note"><ShieldCheck size={16} aria-hidden /><p>Answers cite retrieved records. If the release does not support a claim, the assistant should say so.</p></div>
-            </div>
-          </aside>
         </div>
 
         <footer className="app-footer">

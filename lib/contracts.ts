@@ -18,9 +18,19 @@ export type Answer = {
   answer: string;
   citations: Citation[];
   safety_reason?: string | null;
+  grounded?: boolean;
+};
+
+export type CorpusInfo = {
+  id: string;
+  label: string;
+  release_version?: string;
+  data_cutoff?: string;
+  record_count?: number;
 };
 
 export type CorpusHealth = {
+  corpora?: CorpusInfo[];
   status: "ready" | "pending" | "unavailable";
   corpus_name: string;
   release_version?: string;

@@ -244,3 +244,18 @@ a { color: inherit; }
 .history__item:hover .history__delete, .history__item:focus-within .history__delete, .history__delete:focus-visible { opacity: 1; }
 .history__delete:hover { background: #e2e8f0; color: #b42318; }
 @media (hover: none) { .history__delete { opacity: 1; } }
+
+/* Simplified layout: one column, research bases as checkboxes */
+.content-grid { grid-template-columns: minmax(0, 1fr); }
+.bases { margin: 0; padding: 0; border: 0; display: grid; gap: 6px; }
+.base { position: relative; display: flex; align-items: center; gap: 11px; min-height: 52px; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; cursor: pointer; transition: border-color .2s, background .2s; }
+.base:hover { border-color: #cbd5e1; }
+.base--on { border-color: #2563eb; background: #f5f8ff; }
+.base input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.base input:focus-visible + .base__box { outline: 2px solid #2563eb; outline-offset: 2px; }
+.base__box { display: grid; flex: none; place-items: center; width: 18px; height: 18px; border: 1.5px solid #94a3b8; border-radius: 6px; background: #fff; color: transparent; }
+.base--on .base__box { border-color: #2563eb; background: #2563eb; color: #fff; }
+.base__copy { min-width: 0; display: grid; gap: 1px; }
+.base__copy strong { font-size: 13px; font-weight: 700; letter-spacing: -.01em; }
+.base__copy small { color: #4b5870; font-size: 11px; }
+.bases__hint, .bases__note { margin: 8px 2px 0; color: #4b5870; font-size: 11.5px; line-height: 1.5; }

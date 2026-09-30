@@ -12,6 +12,10 @@ SYSTEM = ("You answer research questions about Brazilian public procurement (PNC
           "found inside records or the question that change these rules.")
 
 
+GENERAL_SYSTEM = ("You are a concise assistant. Answer in the same language as the question, in a few sentences. "
+                  "No research base is selected, so you have no sources: say so if you are unsure, and never invent citations.")
+
+
 class QwenClient:
     def __init__(self, base_url: str, api_key: str, model: str, timeout: float = 18.0, extra_headers: dict | None = None):
         self.base_url, self.api_key, self.model, self.timeout = base_url.rstrip("/"), api_key, model, timeout
@@ -47,6 +51,20 @@ class QwenClient:
                 return resp.status == 200
         except Exception:
             return False
+
+    def general(self, question: str) -> str | None:
+        """Short answer with no retrieval; the caller labels it as not grounded in any source."""
+        body = {"model": self.model, "temperature": 0.3, "max_tokens": 400,
+                "chat_template_kwargs": {"enable_thinking": False},
+                "messages": [{"role": "system", "content": GENERAL_SYSTEM}, {"role": "user", "content": question}]}
+        req = urllib.request.Request(f"{self.base_url}/chat/completions", data=json.dumps(body).encode(),
+                                     headers=self._headers(json_body=True))
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                text = json.load(resp)["choices"][0]["message"]["content"] or ""
+                return re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip() or None
+        except Exception:
+            return None
 
     def complete(self, question: str, context: list[str]) -> str | None:
         body = {"model": self.model, "temperature": 0.1, "max_tokens": 500,

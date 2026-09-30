@@ -146,3 +146,10 @@ def test_sql_base_result_is_cited_with_its_query(engine):
     out = engine.answer("Qual estado lidera?", ["siope"])
     assert out["status"] == "answered" and out["citations"][0]["query"]["sql"].startswith("SELECT uf")
     assert out["citations"][0]["query"]["rows"][0] == ["SP", 10.5]
+
+
+def test_fusion_and_portal_link():
+    from rag_chat_backend.pg_store import fuse, portal_link
+    assert fuse([["a", "b", "c"], ["c", "a"]])[:2] == ["a", "c"]
+    assert portal_link("76416965000121-1-000141/2025") == "https://pncp.gov.br/app/editais/76416965000121/2025/141"
+    assert portal_link("garbage") is None

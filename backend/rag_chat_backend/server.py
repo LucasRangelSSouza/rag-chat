@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import threading
+from urllib.parse import parse_qs, urlparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -41,7 +42,8 @@ def make_engine() -> Engine:
 
         dsn = os.environ["RAG_DATABASE_URL"]
         cutoff = os.environ.get("RAG_CUTOFF", "2026-07-31")
-        corpora[base_id] = Corpus(base_id, base_label, PgStore(dsn, os.environ.get("RAG_TABLE", "pncp.obt_pncp_editais_semantico"), cutoff),
+        corpora[base_id] = Corpus(base_id, base_label,
+                                  PgStore(dsn, os.environ.get("RAG_TABLE", "pncp.obt_pncp_editais_semantico"), cutoff, embed_url=os.environ.get("EMBED_URL")),
                                   slug, release, manifest)
         for extra in json.loads(os.environ.get("RAG_EXTRA_CORPORA") or "[]"):
             if extra.get("type") == "sql":
@@ -76,6 +78,22 @@ def handler(engine: Engine):
         def do_GET(self):
             if self.path in ("/healthz", "/v1/health"):
                 return self._send(200, engine.health())
+            parsed = urlparse(self.path)
+            if parsed.path == "/v1/search":
+                params = parse_qs(parsed.query)
+                mode = (params.get("mode") or ["hybrid"])[0]
+                query = (params.get("q") or [""])[0].strip()
+                try:
+                    limit = max(1, min(25, int((params.get("limit") or ["20"])[0])))
+                except ValueError:
+                    limit = 20
+                store = next((c.store for c in engine.corpora.values() if hasattr(c.store, "explore")), None)
+                if store is None or mode not in ("text", "vector", "hybrid") or not (3 <= len(query) <= 200):
+                    return self._send(400, {"error": "invalid search"})
+                try:
+                    return self._send(200, store.explore(mode, query, limit))
+                except Exception:
+                    return self._send(503, {"error": "search unavailable"})
             self._send(404, {"error": "not found"})
 
         def do_POST(self):

@@ -66,10 +66,10 @@ SYSTEM = ("You write one PostgreSQL SELECT statement that answers the user's que
 class SqlStore:
     is_sql = True
 
-    def __init__(self, dsn: str, tables: list[str], cutoff: str = "n/a") -> None:
+    def __init__(self, dsn: str, tables: list[str], cutoff: str = "n/a", notes: str = "") -> None:
         import psycopg
 
-        self._psycopg, self.dsn, self.tables, self.cutoff = psycopg, dsn, tables, cutoff
+        self._psycopg, self.dsn, self.tables, self.cutoff, self.notes = psycopg, dsn, tables, cutoff, notes
         self.allowed = {t.lower() for t in tables}
         self._schema_text: str | None = None
         self._lock = threading.Lock()
@@ -115,6 +115,11 @@ class SqlStore:
                 return {"error": (reply or {}).get("explanation") or "no query"}
             try:
                 columns, rows = self.run(reply["sql"])
+                if not rows and not feedback:
+                    # An empty answer is usually a wrong filter or table, so ask once for another approach.
+                    feedback = ("\n\nYour previous query returned no rows. Check the filters (values, years, period) and "
+                                "whether a different table or column holds the data, then write a corrected query.")
+                    continue
                 return {"sql": reply["sql"].strip().rstrip(";"), "columns": columns, "rows": rows,
                         "explanation": str(reply.get("explanation", ""))[:300]}
             except UnsafeSql as error:

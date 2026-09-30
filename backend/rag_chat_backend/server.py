@@ -50,7 +50,7 @@ def make_engine() -> Engine:
             if extra.get("type") == "sql":
                 from .sql_agent import SqlStore
 
-                store = SqlStore(os.environ["RAG_SQL_DATABASE_URL"], extra["tables"], extra.get("cutoff", "n/a"))
+                store = SqlStore(os.environ["RAG_SQL_DATABASE_URL"], extra["tables"], extra.get("cutoff", "n/a"), extra.get("notes", ""))
             else:
                 store = PgStore(dsn, extra["table"], extra.get("cutoff", cutoff))
             corpora[extra["id"]] = Corpus(extra["id"], extra["label"], store, extra["dataset_slug"], extra.get("release", "v1"),

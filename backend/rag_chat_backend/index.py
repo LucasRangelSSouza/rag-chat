@@ -50,7 +50,9 @@ def open_index(db_path: Path) -> sqlite3.Connection:
     return db
 
 
-def read_meta(db: sqlite3.Connection) -> dict:
+def read_meta(db) -> dict:
+    if getattr(db, "is_pg", False):
+        return db.meta()
     return {k: json.loads(v) for k, v in db.execute("SELECT k, v FROM meta")}
 
 
@@ -104,7 +106,9 @@ def _match(groups: list[list[str]]) -> str:
     return " AND ".join("(" + " OR ".join(f'"{alt}"' for alt in group) + ")" for group in groups)
 
 
-def search(db: sqlite3.Connection, question: str, k: int = 5) -> tuple[int, list[dict]]:
+def search(db, question: str, k: int = 5) -> tuple[int, list[dict]]:
+    if getattr(db, "is_pg", False):
+        return db.search(question, k)
     groups = _groups(question)
     if not groups:
         return 0, []

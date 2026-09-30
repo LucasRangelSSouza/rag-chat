@@ -80,3 +80,12 @@ def test_english_question_reaches_portuguese_records_via_glossary(engine):
 def test_terms_must_all_match_so_unrelated_questions_abstain(engine):
     assert engine.answer("Qual a receita do bolo de chocolate perfeito?")["status"] == "abstained"
     assert engine.answer("What is the capital of France and who won the World Cup?")["status"] == "abstained"
+
+
+def test_tsquery_ands_the_or_groups_and_quotes_lexemes():
+    from rag_chat_backend.index import _groups
+    from rag_chat_backend.pg_store import tsquery
+
+    query = tsquery(_groups("Which school meal procurements are in the records?"))
+    assert query.startswith("('school' | 'escola'") and " & " in query and "'merenda'" in query
+    assert tsquery([["ok"], ["bad'; drop table x"]]) == "('ok')"  # unsafe lexemes are dropped, never interpolated

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -13,7 +14,17 @@ from .qwen import QwenClient
 MAX_BODY = 16 * 1024
 
 
+def warm_index(path: Path) -> None:
+    """Read the index once so the first visitor does not pay for a cold page cache."""
+    def run() -> None:
+        with path.open("rb") as stream:
+            while stream.read(8 << 20):
+                pass
+    threading.Thread(target=run, daemon=True).start()
+
+
 def make_engine() -> Engine:
+    warm_index(Path(os.environ["RAG_INDEX_PATH"]))
     model = None
     if os.environ.get("QWEN_BASE_URL"):
         model = QwenClient(os.environ["QWEN_BASE_URL"], os.environ.get("QWEN_API_KEY", ""), os.environ.get("QWEN_MODEL", "qwen"),

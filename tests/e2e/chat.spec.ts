@@ -69,7 +69,7 @@ test("reports service failures without losing the visitor's question", async ({ 
   const question = "Quais editais de material escolar foram publicados em 2026?";
   await page.getByRole("textbox", { name: /Ask a question/i }).fill(question);
   await page.getByRole("button", { name: "Send question" }).click();
-  await expect(page.getByText(question)).toBeVisible();
+  await expect(page.locator(".message--user").getByText(question)).toBeVisible();
   await expect(page.getByText("The research service is unavailable. Try again shortly.").first()).toBeVisible();
   await expect(page.getByRole("button", { name: /Try again/i })).toBeVisible();
 });
@@ -124,4 +124,50 @@ test("opens and closes the mobile navigation and passes axe checks", async ({ pa
   }
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations).toEqual([]);
+});
+
+test("conversation history: new research, reopen, persist across reload, delete", async ({ page, isMobile }) => {
+  let calls = 0;
+  await page.route("**/api/answer", (route) => {
+    calls += 1;
+    return route.fulfill({ json: {
+      status: "answered",
+      answer: `Answer number ${calls}. [record-${calls}]`,
+      citations: [{ title: "Semantic procurement notices", source_uri: "https://www.kaggle.com/datasets/lucasrangelss/x", record_ids: [`record-${calls}`] }],
+    } });
+  });
+  await page.goto("/");
+  const box = page.getByRole("textbox", { name: /Ask a question/i });
+  const openMenu = async () => { if (isMobile) await page.getByRole("button", { name: "Open navigation" }).click(); };
+
+  await box.fill("First question about school meals");
+  await box.press("Enter");
+  await expect(page.getByText("Answer number 1.")).toBeVisible();
+
+  await openMenu();
+  const history = page.getByRole("navigation", { name: "Conversation history" });
+  await expect(history.getByRole("button", { name: "First question about school meals", exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: /New research/i }).click();
+  await expect(page.getByRole("heading", { name: /Ask the record/i })).toBeVisible();
+  await expect(page.getByText("Answer number 1.")).toHaveCount(0);
+
+  await box.fill("Second question about transport");
+  await box.press("Enter");
+  await expect(page.getByText("Answer number 2.")).toBeVisible();
+
+  await openMenu();
+  await expect(history.getByRole("button")).toHaveCount(4); // two conversations, each with an open and a delete button
+
+  await history.getByRole("button", { name: "First question about school meals", exact: true }).click();
+  await expect(page.getByText("Answer number 1.")).toBeVisible();
+  await expect(page.getByText("Answer number 2.")).toHaveCount(0);
+
+  await page.reload();
+  await openMenu();
+  await expect(history.getByRole("button", { name: "Second question about transport", exact: true })).toBeVisible();
+
+  await history.getByRole("button", { name: /Delete conversation: Second question about transport/ }).click();
+  await expect(history.getByRole("button", { name: "Second question about transport", exact: true })).toHaveCount(0);
+  await expect(history.getByRole("button", { name: "First question about school meals", exact: true })).toBeVisible();
 });

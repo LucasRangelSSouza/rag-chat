@@ -230,3 +230,17 @@ a { color: inherit; }
   .welcome__release { align-items: flex-start; }
   .composer__meta { gap: 7px; }
 }
+
+/* Conversation history */
+.history { margin-top: 6px; max-height: 42vh; overflow-y: auto; }
+.history ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.history__empty { margin: 4px 2px; color: #64748b; font-size: 12px; line-height: 1.5; }
+.history__item { display: flex; align-items: center; border-radius: 9px; }
+.history__item:hover, .history__item:focus-within { background: #f1f5f9; }
+.history__item--active { background: #eaf0fb; }
+.history__open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; min-height: 38px; padding: 0 10px; border: 0; background: transparent; color: #27344a; font: inherit; font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer; border-radius: 9px; }
+.history__open span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history__delete { display: grid; place-items: center; width: 30px; height: 30px; margin-right: 4px; border: 0; border-radius: 8px; background: transparent; color: #64748b; opacity: 0; cursor: pointer; }
+.history__item:hover .history__delete, .history__item:focus-within .history__delete, .history__delete:focus-visible { opacity: 1; }
+.history__delete:hover { background: #e2e8f0; color: #b42318; }
+@media (hover: none) { .history__delete { opacity: 1; } }

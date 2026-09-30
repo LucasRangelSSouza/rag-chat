@@ -11,7 +11,7 @@ export async function GET() {
   try {
     const response = await fetch(`${backend.replace(/\/$/, "")}/healthz`, {
       cache: "no-store",
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(10000),
     });
     if (!response.ok) throw new Error("backend_unavailable");
     const payload = await response.json();

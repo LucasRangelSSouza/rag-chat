@@ -15,6 +15,7 @@ import {
   Menu,
   MessageSquareText,
   Plus,
+  Trash2,
   RotateCcw,
   ShieldCheck,
   X,
@@ -103,9 +104,33 @@ function CitationCard({ citation, index, compact = false }: { citation: Citation
   );
 }
 
+type Conversation = { id: string; title: string; updatedAt: number; messages: ChatMessage[] };
+const STORAGE_KEY = "rag-chat.conversations.v1";
+const MAX_CONVERSATIONS = 30;
+
+function readHistory(): Conversation[] {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((item) => item && typeof item.id === "string" && Array.isArray(item.messages)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeHistory(items: Conversation[]) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items.slice(0, MAX_CONVERSATIONS)));
+  } catch {
+    /* storage can be unavailable (private window); history then lasts for the session only */
+  }
+}
+
 export function ChatWorkspace() {
   const [health, setHealth] = useState<CorpusHealth>(INITIAL_HEALTH);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [history, setHistory] = useState<Conversation[]>([]);
+  const [activeId, setActiveId] = useState("");
   const [question, setQuestion] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,12 +141,42 @@ export function ChatWorkspace() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/health", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((result: CorpusHealth) => { if (active) setHealth(result); })
-      .catch(() => { if (active) setHealth({ ...INITIAL_HEALTH, status: "unavailable" }); });
-    return () => { active = false; };
+    let timer: ReturnType<typeof setTimeout>;
+    async function check() {
+      try {
+        const response = await fetch("/api/health", { cache: "no-store", signal: AbortSignal.timeout(12000) });
+        const result: CorpusHealth = await response.json();
+        if (active) setHealth(result);
+        if (active) timer = setTimeout(check, result.status === "ready" ? 60000 : 8000);
+      } catch {
+        if (active) {
+          setHealth((current) => (current.status === "ready" ? current : { ...INITIAL_HEALTH, status: "unavailable" }));
+          timer = setTimeout(check, 8000);
+        }
+      }
+    }
+    void check();
+    return () => { active = false; clearTimeout(timer); };
   }, []);
+
+  useEffect(() => {
+    setHistory(readHistory());
+    setActiveId(crypto.randomUUID());
+  }, []);
+
+  useEffect(() => {
+    const settled = messages.filter((message) => message.status !== "loading");
+    if (!activeId || !settled.length || pending) return;
+    const firstQuestion = settled.find((message) => message.role === "user")?.text ?? "Research";
+    setHistory((current) => {
+      const next = [
+        { id: activeId, title: firstQuestion.slice(0, 60), updatedAt: Date.now(), messages: settled.slice(-40) },
+        ...current.filter((item) => item.id !== activeId),
+      ].slice(0, MAX_CONVERSATIONS);
+      writeHistory(next);
+      return next;
+    });
+  }, [messages, activeId, pending]);
 
   useEffect(() => {
     function onShortcut(event: globalThis.KeyboardEvent) {
@@ -189,11 +244,30 @@ export function ChatWorkspace() {
   }
 
   function startNewConversation() {
+    if (pending) return;
+    setActiveId(crypto.randomUUID());
     setMessages([]);
     setQuestion("");
     setError(null);
     setSidebarOpen(false);
     textareaRef.current?.focus();
+  }
+
+  function openConversation(id: string) {
+    if (pending) return;
+    const target = history.find((item) => item.id === id);
+    if (!target) return;
+    setActiveId(id);
+    setMessages(target.messages);
+    setError(null);
+    setSidebarOpen(false);
+  }
+
+  function deleteConversation(id: string) {
+    const next = history.filter((item) => item.id !== id);
+    setHistory(next);
+    writeHistory(next);
+    if (id === activeId) startNewConversation();
   }
 
   const releaseDetail = health.status === "ready"
@@ -215,12 +289,26 @@ export function ChatWorkspace() {
             <span>New research</span>
             <span className="new-research__shortcut">⌘ K</span>
           </button>
-          <p className="nav-label">WORKSPACE</p>
-          <div className="nav-current" aria-current="page">
-            <MessageSquareText size={16} aria-hidden />
-            <span>Research session</span>
-            <span className="nav-current__dot" aria-hidden="true" />
-          </div>
+          <p className="nav-label">HISTORY</p>
+          <nav className="history" aria-label="Conversation history">
+            {history.length === 0 ? (
+              <p className="history__empty">Your conversations are saved in this browser and listed here.</p>
+            ) : (
+              <ul>
+                {history.map((item) => (
+                  <li key={item.id} className={`history__item${item.id === activeId ? " history__item--active" : ""}`}>
+                    <button className="history__open" onClick={() => openConversation(item.id)} aria-current={item.id === activeId ? "true" : undefined} title={item.title}>
+                      <MessageSquareText size={15} aria-hidden />
+                      <span>{item.title}</span>
+                    </button>
+                    <button className="history__delete" onClick={() => deleteConversation(item.id)} aria-label={`Delete conversation: ${item.title}`}>
+                      <Trash2 size={14} aria-hidden />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </nav>
         </div>
 
         <div className="sidebar__corpus">

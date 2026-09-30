@@ -153,3 +153,94 @@ def test_fusion_and_portal_link():
     assert fuse([["a", "b", "c"], ["c", "a"]])[:2] == ["a", "c"]
     assert portal_link("76416965000121-1-000141/2025") == "https://pncp.gov.br/app/editais/76416965000121/2025/141"
     assert portal_link("garbage") is None
+
+
+# --- embedding clients -------------------------------------------------------------------------------------------
+import json as _json
+import threading as _threading
+from http.server import BaseHTTPRequestHandler as _Handler, HTTPServer as _Server
+
+from rag_chat_backend.embed_service import EmbeddingError, QwenEmbedder
+
+
+def _embedding_server(script):
+    """HTTP server that answers with the next item of `script`: an int status or a dict payload. Records requests."""
+    seen = []
+
+    class H(_Handler):
+        def do_POST(self):
+            body = _json.loads(self.rfile.read(int(self.headers["content-length"])))
+            seen.append({"path": self.path, "auth": self.headers.get("Authorization"), "body": body})
+            step = script[min(len(seen) - 1, len(script) - 1)]
+            if isinstance(step, int):
+                self.send_response(step); self.end_headers(); self.wfile.write(b"{}"); return
+            data = _json.dumps(step).encode()
+            self.send_response(200); self.send_header("content-length", str(len(data))); self.end_headers(); self.wfile.write(data)
+
+        def log_message(self, *args):
+            pass
+
+    server = _Server(("127.0.0.1", 0), H)
+    _threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server, seen
+
+
+def _vector(dim=768):
+    return {"data": [{"embedding": [0.1] * dim}]}
+
+
+def test_qwen_embedder_sends_instruction_on_queries_only_and_truncates_dimension():
+    server, seen = _embedding_server([_vector()])
+    try:
+        client = QwenEmbedder(base_url=f"http://127.0.0.1:{server.server_port}/v1", api_key="k", attempts=1)
+        assert len(client.embed("merenda escolar", "query")) == 768
+        client.embed("edital de merenda", "document")
+    finally:
+        server.shutdown()
+    assert seen[0]["path"] == "/v1/embeddings" and seen[0]["auth"] == "Bearer k"
+    assert seen[0]["body"]["dimensions"] == 768 and seen[0]["body"]["model"] == "qwen-embedding"
+    assert seen[0]["body"]["input"][0].startswith("Instruct: ") and seen[0]["body"]["input"][0].endswith("\nQuery:merenda escolar")
+    assert seen[1]["body"]["input"] == ["edital de merenda"]
+
+
+def test_qwen_embedder_retries_server_errors_then_succeeds():
+    server, seen = _embedding_server([503, 503, _vector()])
+    try:
+        client = QwenEmbedder(base_url=f"http://127.0.0.1:{server.server_port}/v1", attempts=3, backoff=0.01)
+        assert len(client.embed("x y z")) == 768
+    finally:
+        server.shutdown()
+    assert len(seen) == 3
+
+
+def test_qwen_embedder_does_not_retry_client_errors_and_reports_a_clear_code():
+    server, seen = _embedding_server([401])
+    try:
+        client = QwenEmbedder(base_url=f"http://127.0.0.1:{server.server_port}/v1", attempts=3, backoff=0.01)
+        try:
+            client.embed("x y z")
+            raise AssertionError("expected an error")
+        except EmbeddingError as exc:
+            assert exc.code == "endpoint_error" and "401" in str(exc)
+    finally:
+        server.shutdown()
+    assert len(seen) == 1
+
+
+def test_qwen_embedder_rejects_a_wrong_dimension_and_reports_unreachable_endpoints():
+    server, _ = _embedding_server([_vector(1024)])
+    try:
+        client = QwenEmbedder(base_url=f"http://127.0.0.1:{server.server_port}/v1", attempts=1)
+        try:
+            client.embed("x y z")
+            raise AssertionError("expected an error")
+        except EmbeddingError as exc:
+            assert exc.code == "bad_dimension"
+    finally:
+        server.shutdown()
+    dead = QwenEmbedder(base_url="http://127.0.0.1:9/v1", attempts=2, backoff=0.01, timeout=1)
+    try:
+        dead.embed("x y z")
+        raise AssertionError("expected an error")
+    except EmbeddingError as exc:
+        assert exc.code == "endpoint_unreachable"

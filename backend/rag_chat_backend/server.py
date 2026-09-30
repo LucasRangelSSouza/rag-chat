@@ -43,7 +43,8 @@ def make_engine() -> Engine:
         dsn = os.environ["RAG_DATABASE_URL"]
         cutoff = os.environ.get("RAG_CUTOFF", "2026-07-31")
         corpora[base_id] = Corpus(base_id, base_label,
-                                  PgStore(dsn, os.environ.get("RAG_TABLE", "pncp.obt_pncp_editais_semantico"), cutoff, embed_url=os.environ.get("EMBED_URL")),
+                                  PgStore(dsn, os.environ.get("RAG_TABLE", "pncp.obt_pncp_editais_semantico"), cutoff, embed_url=os.environ.get("EMBED_URL"),
+                                          vectors_table=os.environ.get("RAG_VECTORS_TABLE", "pncp.editais_embeddings")),
                                   slug, release, manifest)
         for extra in json.loads(os.environ.get("RAG_EXTRA_CORPORA") or "[]"):
             if extra.get("type") == "sql":

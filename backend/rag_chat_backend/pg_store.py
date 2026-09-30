@@ -65,7 +65,7 @@ class PgStore:
 
     def _connection(self):
         if self._conn is None or self._conn.closed:
-            self._conn = self._psycopg.connect(self.dsn, autocommit=True, connect_timeout=5, options="-c hnsw.ef_search=60")
+            self._conn = self._psycopg.connect(self.dsn, autocommit=True, connect_timeout=5, options="-c hnsw.ef_search=60 -c ivfflat.probes=12")
         return self._conn
 
     def _run(self, sql: str, params: tuple = ()):
@@ -89,7 +89,7 @@ class PgStore:
         if not self.embed_url:
             return None
         try:
-            request = urllib.request.Request(self.embed_url.rstrip("/") + "/embed", data=json.dumps({"text": text[:1000]}).encode(),
+            request = urllib.request.Request(self.embed_url.rstrip("/") + "/embed", data=json.dumps({"text": text[:1000], "kind": "query"}).encode(),
                                              headers={"content-type": "application/json"})
             with urllib.request.urlopen(request, timeout=10) as response:
                 vector = json.load(response)["embedding"]

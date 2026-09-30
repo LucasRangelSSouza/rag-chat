@@ -54,7 +54,9 @@ await check("SIOPE SQL base shows the query as evidence", async () => {
   await boxes.nth(0).uncheck();
   await boxes.nth(2).check();
   await ask("What was the median education investment per student in 2023, by region?");
-  await page.getByText(/SELECT/).first().waitFor({ timeout: 150000 });
+  await page.getByText(/SQL and result/).first().waitFor({ timeout: 150000 });
+  await page.getByText(/SQL and result/).first().click();
+  await page.getByText(/SELECT/).first().waitFor({ timeout: 10000 });
   await page.screenshot({ path: `${OUT}/03-siope-sql.png`, fullPage: true });
 });
 

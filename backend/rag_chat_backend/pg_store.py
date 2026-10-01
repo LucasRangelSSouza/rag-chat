@@ -91,7 +91,7 @@ class PgStore:
         try:
             request = urllib.request.Request(self.embed_url.rstrip("/") + "/embed", data=json.dumps({"text": text[:1000], "kind": "query"}).encode(),
                                              headers={"content-type": "application/json"})
-            with urllib.request.urlopen(request, timeout=10) as response:
+            with urllib.request.urlopen(request, timeout=25) as response:
                 vector = json.load(response)["embedding"]
             return vector if isinstance(vector, list) and len(vector) == 768 else None
         except Exception:

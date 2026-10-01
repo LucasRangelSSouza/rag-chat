@@ -84,14 +84,14 @@ await check("explorer semantic search answers or explains", async () => {
 
 await check("PNCP dashboard frame renders charts", async () => {
   const frame = page.frameLocator("iframe").first();
-  await frame.getByText(/PNCP notices/i).first().waitFor({ timeout: 90000 });
+  await frame.getByText(/Pregão - Eletrônico/).first().waitFor({ timeout: 150000 });  // a label that only exists once data has drawn
   await page.screenshot({ path: `${OUT}/06-pncp-dashboard.png`, fullPage: true });
 });
 
 await check("SIOPE dashboard frame renders charts", async () => {
   await page.goto(`${SITE}/dashboards/siope/`, { waitUntil: "domcontentloaded" });
   const frame = page.frameLocator("iframe").first();
-  await frame.getByText(/SIOPE/i).first().waitFor({ timeout: 90000 });
+  await frame.getByText(/Centro-Oeste/).first().waitFor({ timeout: 150000 });
   await page.screenshot({ path: `${OUT}/07-siope-dashboard.png`, fullPage: true });
 });
 

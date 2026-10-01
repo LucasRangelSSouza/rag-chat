@@ -244,3 +244,15 @@ def test_qwen_embedder_rejects_a_wrong_dimension_and_reports_unreachable_endpoin
         raise AssertionError("expected an error")
     except EmbeddingError as exc:
         assert exc.code == "endpoint_unreachable"
+
+
+def test_dates_and_decimals_serialise_instead_of_failing_the_answer():
+    import datetime
+    import decimal
+    import json
+
+    from rag_chat_backend.server import _json_default
+
+    payload = {"published": datetime.date(2026, 7, 31), "at": datetime.datetime(2026, 7, 31, 12, 0), "n": decimal.Decimal("1.5")}
+    text = json.dumps(payload, default=_json_default)
+    assert "2026-07-31" in text and "1.5" in text

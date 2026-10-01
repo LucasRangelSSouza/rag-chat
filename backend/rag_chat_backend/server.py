@@ -66,10 +66,19 @@ def make_engine() -> Engine:
     return Engine(corpora=corpora, model=model)
 
 
+def _json_default(value):
+    """Rows and records read from Postgres carry dates and decimals; render them as text instead of failing the whole answer."""
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    if isinstance(value, (set, frozenset)):
+        return sorted(value, key=str)
+    return str(value)
+
+
 def handler(engine: Engine):
     class H(BaseHTTPRequestHandler):
         def _send(self, code: int, payload: dict) -> None:
-            data = json.dumps(payload, ensure_ascii=False).encode()
+            data = json.dumps(payload, ensure_ascii=False, default=_json_default).encode()
             self.send_response(code)
             self.send_header("content-type", "application/json; charset=utf-8")
             self.send_header("content-length", str(len(data)))

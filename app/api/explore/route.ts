@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { admit, clientIp, exploreLimits } from "@/lib/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,10 @@ export async function GET(request: Request) {
   if (!MODES.has(mode) || q.length < 3 || q.length > 200) {
     return NextResponse.json({ error: "Type between 3 and 200 characters." }, { status: 400 });
   }
+  const admission = admit(clientIp(request), exploreLimits());
+  if (!admission.ok) {
+    return NextResponse.json({ error: admission.message }, { status: 429, headers: { "retry-after": String(admission.retryAfter) } });
+  }
   try {
     const response = await fetch(
       `${backend.replace(/\/$/, "")}/v1/search?mode=${mode}&limit=${limit}&q=${encodeURIComponent(q)}`,
@@ -57,5 +62,7 @@ export async function GET(request: Request) {
     });
   } catch {
     return NextResponse.json({ error: "The search service is unavailable." }, { status: 503 });
+  } finally {
+    admission.release();
   }
 }

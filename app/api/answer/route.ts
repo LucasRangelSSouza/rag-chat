@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { Answer, Citation } from "@/lib/contracts";
+import { admit, answerLimits, clientIp, crossSiteOrigin } from "@/lib/guard";
 
 export const dynamic = "force-dynamic";
 const MAX_QUESTION_CHARS = 1000;
@@ -52,6 +53,9 @@ function safeAnswer(value: unknown): Answer | null {
 }
 
 export async function POST(request: Request) {
+  if (crossSiteOrigin(request)) {
+    return NextResponse.json({ error: "Ask from the chat page." }, { status: 403 });
+  }
   const declaredLength = Number(request.headers.get("content-length") || 0);
   if (declaredLength > MAX_BODY_BYTES) {
     return NextResponse.json({ error: "The request is too large." }, { status: 413 });
@@ -87,6 +91,10 @@ export async function POST(request: Request) {
   }
   const backend = process.env.RAG_CHAT_BACKEND_URL;
   if (!backend) return NextResponse.json({ error: "The research service is not ready yet." }, { status: 503 });
+  const admission = admit(clientIp(request), answerLimits());
+  if (!admission.ok) {
+    return NextResponse.json({ error: admission.message }, { status: 429, headers: { "retry-after": String(admission.retryAfter) } });
+  }
   try {
     const response = await fetch(`${backend.replace(/\/$/, "")}/v1/answer`, {
       method: "POST",
@@ -101,5 +109,7 @@ export async function POST(request: Request) {
     return NextResponse.json(answer, { headers: { "cache-control": "no-store" } });
   } catch {
     return NextResponse.json({ error: "The research service is unavailable. Try again shortly." }, { status: 503 });
+  } finally {
+    admission.release();
   }
 }

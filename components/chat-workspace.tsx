@@ -5,6 +5,7 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  ArrowUpRight,
   BookOpen,
   Check,
   ChevronDown,
@@ -21,6 +22,13 @@ import {
   X,
 } from "lucide-react";
 import type { Answer, Citation, CorpusHealth } from "@/lib/contracts";
+
+/** Metabase's data browser for each base: table names, fields and rows, behind the read-only demo login. */
+const TABLE_BROWSER: Record<string, string> = {
+  pncp: "https://bi.rangeltech.net/browse/databases/2/schema/pncp",
+  "pncp-sql": "https://bi.rangeltech.net/browse/databases/2/schema/pncp",
+  siope: "https://bi.rangeltech.net/browse/databases/2/schema/siope",
+};
 
 type ChatMessage = {
   id: string;
@@ -361,6 +369,12 @@ export function ChatWorkspace() {
                 <span className="base__copy">
                   <strong>{base.label}</strong>
                   <small>{base.record_count ? `${base.record_count.toLocaleString("en-US")} records` : "Records"} · through {base.data_cutoff ?? "n/a"}</small>
+                  {TABLE_BROWSER[base.id] ? (
+                    <a className="base__link" href={TABLE_BROWSER[base.id]} target="_blank" rel="noreferrer">
+                      See the tables in Metabase <ArrowUpRight size={11} aria-hidden />
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  ) : null}
                 </span>
               </label>
             ))}

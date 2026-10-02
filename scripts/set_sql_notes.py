@@ -10,13 +10,14 @@ PNCP_SQL = (
     "ano_contrato BETWEEN 2021 AND 2026 (a few rows hold malformed years). nome_municipio and sigla_uf are the municipality "
     "and state of the contracting body. The supplier is nome_razao_social_fornecedor (document ni_fornecedor). "
     "orgao_esfera_id: M municipal, E state, F federal, D federal district, N not informed. orgao_poder_id: E executive, "
-    "L legislative, J judiciary, N not informed. Search the contract object with objeto_contrato ILIKE '%term%' (a trigram "
-    "index makes this fast); Portuguese words carry accents and the data is not unaccented, so cut each search word "
-    "before its first accented letter: 'combustível' becomes '%combust%', 'licitação' becomes '%licita%', 'saúde' becomes "
-    "'%sa_de%' (underscore matches one letter), 'ambulância' becomes '%ambul%'. Some valor_global values are data-entry errors (billions for small purchases): for sums, "
+    "L legislative, J judiciary, N not informed. Compare every text value without accents and in upper case on both sides, using the database function "
+    "public.f_unaccent: to search the contract object write public.f_unaccent(upper(objeto_contrato)) LIKE "
+    "public.f_unaccent(upper('%ambulância%')), and to match a municipality write public.f_unaccent(upper(nome_municipio)) = "
+    "public.f_unaccent(upper('Goiânia')) together with sigla_uf. Indexes exist for exactly these expressions, so keep "
+    "them as written. For price registrations use public.f_unaccent(upper(objeto_contratacao)). "
+    "Some valor_global values are data-entry errors (billions for small purchases): for sums, "
     "averages and rankings by value add valor_global < 1e9 and say in the explanation that contracts above 1 billion BRL "
-    "were excluded. Names keep their accents: compare municipality names exactly, as in nome_municipio = 'Goiânia' or "
-    "'São Paulo', together with sigla_uf. "
+    "were excluded. "
     "obt_pncp_atas has one row per price registration (ata): ano_ata, cancelado, objeto_contratacao, nome_orgao. "
     "Return names, never only codes, and always select the measure (the count or the sum) next to the names. "
     "'Por estado' or 'by state' means GROUP BY sigla_uf; orgao_esfera_id is the level of government, not the state."
@@ -25,7 +26,8 @@ PNCP_SQL = (
 SIOPE_EXTRA = (
     " Years available: 2021 to 2025 only (2025 partial); when a question asks for earlier years, answer with the years that "
     "exist. Always return municipality names (nome_municipio from obt_ibge_municipio or from the siope tables), never only "
-    "codes. Per-student values above 100000 BRL are data-entry errors: exclude valor > 100000 from rankings and say so. "
+    "codes. Match names without accents and in upper case on both sides: public.f_unaccent(upper(nome_municipio)) = "
+    "public.f_unaccent(upper('Goiânia')). Per-student values above 100000 BRL are data-entry errors: exclude valor > 100000 from rankings and say so. "
     "Indicator codes in obt_fnde_siope_indicador_municipio_ano (codigo_indicador is text): '24' share of tax revenue applied "
     "in MDE, legal minimum 25 percent; '35' education spending as a share of all spending; '57' investment per student; "
     "'44' per student in early childhood education, '45' in primary education, '46' in secondary education; '28' share of "
@@ -45,8 +47,9 @@ def main(path: str) -> None:
             for base in corpora:
                 if base["id"] == "pncp-sql":
                     base["notes"] = PNCP_SQL
-                elif base["id"] == "siope" and SIOPE_EXTRA.strip() not in base.get("notes", ""):
-                    base["notes"] = base.get("notes", "") + SIOPE_EXTRA
+                elif base["id"] == "siope":
+                    # Keep the original notes, replace any earlier version of the extra block.
+                    base["notes"] = base.get("notes", "").split(" Years available:")[0] + SIOPE_EXTRA
             lines[i] = "RAG_EXTRA_CORPORA=" + json.dumps(corpora, ensure_ascii=False)
     open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
     print("notes set")

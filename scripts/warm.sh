@@ -10,10 +10,11 @@ PGUSER_IN=$(docker exec "$DB" printenv POSTGRES_USER)
 docker exec -i "$DB" psql -U "$PGUSER_IN" -d pncp -qAt >/dev/null <<'SQL'
 CREATE EXTENSION IF NOT EXISTS pg_prewarm;
 SELECT pg_prewarm('pncp.obt_pncp_contratos', 'read');
-SELECT pg_prewarm('pncp.obt_pncp_contratos_objeto_trgm', 'read');
+SELECT pg_prewarm('pncp.obt_pncp_contratos_objeto_norm_trgm', 'read');
+SELECT pg_prewarm('pncp.obt_pncp_contratos_mun_norm', 'read');
 SELECT pg_prewarm('pncp.obt_pncp_contratos_ano_uf_mun_idx', 'read');
 SELECT pg_prewarm('pncp.obt_pncp_atas', 'read');
-SELECT pg_prewarm('pncp.obt_pncp_atas_objeto_trgm', 'read');
+SELECT pg_prewarm('pncp.obt_pncp_atas_objeto_norm_trgm', 'read');
 SELECT pg_prewarm('pncp.editais_embeddings_qwen_ivf', 'read');
 SQL
 

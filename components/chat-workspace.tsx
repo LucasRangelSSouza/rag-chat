@@ -39,10 +39,14 @@ type ChatMessage = {
   status?: "loading" | "answered" | "abstained" | "refused" | "error";
 };
 
-const EXAMPLES = [
-  "What procurement notices include school transport services?",
-  "Quais editais de material escolar foram publicados em 2026?",
-  "How many procurement records are included in this release?",
+/** Demo questions with quick, checked answers; each one selects the base it needs before asking. */
+const EXAMPLES: { text: string; bases: string[] }[] = [
+  { text: "Quais editais de merenda escolar foram publicados em Goiás?", bases: ["pncp"] },
+  { text: "Qual município assinou mais contratos em 2025?", bases: ["pncp-sql"] },
+  { text: "Qual o município que mais gastou com contratos de software em 2025?", bases: ["pncp-sql"] },
+  { text: "Qual estado tem a maior média de investimento por aluno em 2023?", bases: ["siope"] },
+  { text: "Which notices are about school uniforms?", bases: ["pncp"] },
+  { text: "Quantos municípios declararam ao SIOPE em 2024?", bases: ["siope"] },
 ];
 
 const INITIAL_HEALTH: CorpusHealth = {
@@ -245,7 +249,7 @@ export function ChatWorkspace() {
   }, [messages]);
 
 
-  async function ask(text: string) {
+  async function ask(text: string, bases?: string[]) {
     const prompt = text.trim();
     if (!prompt || pending || prompt.length > 1000) return;
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: "user", text: prompt };
@@ -258,7 +262,7 @@ export function ChatWorkspace() {
       const response = await fetch("/api/answer", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: prompt, corpora: selected }),
+        body: JSON.stringify({ question: prompt, corpora: bases ?? selected }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(typeof payload.error === "string" ? payload.error : "The research service is unavailable.");
@@ -418,8 +422,8 @@ export function ChatWorkspace() {
                     <div className="prompt-section__heading"><span>START WITH A QUESTION</span><span>Examples</span></div>
                     <div className="prompt-list">
                       {EXAMPLES.map((example) => (
-                        <button key={example} className="prompt-card" onClick={() => void ask(example)} disabled={pending || health.status !== "ready"}>
-                          <span>{example}</span><ArrowUp size={15} aria-hidden />
+                        <button key={example.text} className="prompt-card" onClick={() => { setSelected(example.bases); void ask(example.text, example.bases); }} disabled={pending || health.status !== "ready"}>
+                          <span>{example.text}</span><ArrowUp size={15} aria-hidden />
                         </button>
                       ))}
                     </div>

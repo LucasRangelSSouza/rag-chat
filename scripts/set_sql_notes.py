@@ -15,7 +15,8 @@ PNCP_SQL = (
     "'%licita%' or '%softwar%'. Some valor_global values are data-entry errors in the trillions: for sums, averages and "
     "rankings by value add valor_global < 1e10 and say in the explanation that values above 10 billion BRL were excluded. "
     "obt_pncp_atas has one row per price registration (ata): ano_ata, cancelado, objeto_contratacao, nome_orgao. "
-    "Return names, never only codes."
+    "Return names, never only codes, and always select the measure (the count or the sum) next to the names. "
+    "'Por estado' or 'by state' means GROUP BY sigla_uf; orgao_esfera_id is the level of government, not the state."
 )
 
 SIOPE_EXTRA = (

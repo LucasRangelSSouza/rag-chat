@@ -359,3 +359,17 @@ def test_state_filter_reads_names_and_upper_case_codes_only():
     assert state_filter("merenda em GO")[0] == "GO"
     assert state_filter("compra para o setor de licitação")[0] is None
     assert state_filter("Editais de software de gestão pública")[0] is None
+
+
+def test_model_answers_are_cached_for_the_same_question_and_bases(engine):
+    calls = []
+    class Model:
+        def ready(self): return True
+        def complete(self, q, ctx):
+            calls.append(q)
+            return "A Prefeitura de Exemplo/GO compra merenda escolar para a rede municipal [C1]."
+    engine.model = Model()
+    first = engine.answer("Quais compras de merenda escolar existem?", ["pncp"])
+    again = engine.answer("  quais compras de MERENDA escolar existem? ", ["pncp"])
+    assert len(calls) == 1 and again["cached"] is True and again["answer"] == first["answer"]
+    assert "model_written" not in first

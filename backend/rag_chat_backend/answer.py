@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+import threading
+import time
+from collections import OrderedDict
+from dataclasses import dataclass, field
 from typing import Any
 
 from .guardrails import check_question
@@ -48,6 +51,10 @@ def _merge(per_corpus: list[tuple[Corpus, list[dict]]], k: int) -> list[tuple[Co
 class Engine:
     corpora: dict[str, Corpus]
     model: Any = None  # model client or None (cited extractive mode)
+    cache_seconds: float = 6 * 3600
+    cache_size: int = 300
+    _cache: OrderedDict = field(default_factory=OrderedDict, repr=False)
+    _cache_lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     def _model_ready(self) -> bool:
         return self.model is not None and getattr(self.model, "available", lambda: True)()
@@ -79,6 +86,28 @@ class Engine:
         return c
 
     def answer(self, question: str, corpus_ids: list[str] | None = None) -> dict:
+        """Answer with a short-lived cache, so a question asked again (a demo, a shared link) returns at once.
+
+        Only model-written answers are cached: an extractive fallback from a moment when the model was down
+        should not outlive the outage.
+        """
+        key = (" ".join(question.lower().split()), tuple(sorted(set(corpus_ids or []))))
+        now = time.monotonic()
+        with self._cache_lock:
+            hit = self._cache.get(key)
+            if hit and now - hit[0] < self.cache_seconds:
+                self._cache.move_to_end(key)
+                return {**hit[1], "cached": True}
+        result = self._answer(question, corpus_ids)
+        if result.get("model_written"):
+            with self._cache_lock:
+                self._cache[key] = (now, result)
+                while len(self._cache) > self.cache_size:
+                    self._cache.popitem(last=False)
+        result.pop("model_written", None)
+        return result
+
+    def _answer(self, question: str, corpus_ids: list[str] | None = None) -> dict:
         lang = detect_language(question)
         msg = MESSAGES[lang]
         reason = check_question(question)
@@ -114,17 +143,22 @@ class Engine:
         if self._model_ready():
             language = "Brazilian Portuguese" if lang == "pt" else "English"
             text = self.model.complete(f"{question}\n\n(Answer in {language}.)", tagged)
-        if text and len(CITE.sub("", text).strip(" .,;:\n")) < 40:
+        if text and len(re.findall(r"\w+", CITE.sub("", text))) < 3:
             text = None  # a reply that is little more than citation tags tells the reader nothing
         if text and text != "NO_ANSWER":
             used = {int(n) for n in CITE.findall(text)}
             if used and used <= set(range(1, len(tagged) + 1)):
                 cited = [c for c in citations if int(c["chunk_id"].split(":")[0][1:]) in used or "query" in c]
-                return {"status": "answered", "answer": f"{text}\n\n{cov}", "citations": cited, "safety_reason": None, "grounded": True}
+                return {"status": "answered", "answer": f"{text}\n\n{cov}", "citations": cited, "safety_reason": None, "grounded": True,
+                        "model_written": True}
         if plan.aggregate and sql_bases and not any("query" in c for c in citations):
             # A list of matching notices is not an answer to "how many" or "which has the most".
             return {"status": "abstained", "answer": f"{msg['needs_sql']}\n\n{cov}", "citations": [], "safety_reason": None, "grounded": True}
-        body = msg["found"].format(n=total or len(tagged), k=len(tagged)) + "\n" + "\n".join(tagged) + "\n\n" + cov
+        if citations and all("query" in c for c in citations):
+            head = msg["sql_result"]  # a query result is not a list of matching records
+        else:
+            head = msg["found"].format(n=total or len(tagged), k=len(tagged))
+        body = head + "\n" + "\n".join(tagged) + "\n\n" + cov
         return {"status": "answered", "answer": body, "citations": citations, "safety_reason": None, "grounded": True}
 
     def _retrieve(self, question: str, bases: list[Corpus], msg: dict, tagged: list[str], citations: list[dict]) -> int:

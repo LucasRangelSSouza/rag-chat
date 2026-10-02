@@ -337,7 +337,7 @@ export function ChatWorkspace() {
           <button className="icon-button sidebar__close" onClick={() => setSidebarOpen(false)} aria-label="Close navigation"><X size={18} /></button>
           <button className="new-research" onClick={startNewConversation}>
             <Plus size={17} aria-hidden />
-            <span>New research</span>
+            <span>New chat</span>
             <span className="new-research__shortcut">⌘ K</span>
           </button>
           <p className="nav-label">HISTORY</p>

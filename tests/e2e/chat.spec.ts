@@ -149,7 +149,7 @@ test("conversation history: new research, reopen, persist across reload, delete"
   const history = page.getByRole("navigation", { name: "Conversation history" });
   await expect(history.getByRole("button", { name: "First question about school meals", exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: /New research/i }).click();
+  await page.getByRole("button", { name: /New chat/i }).click();
   await expect(page.getByRole("heading", { name: /Ask the record/i })).toBeVisible();
   await expect(page.getByText("Answer number 1.")).toHaveCount(0);
 

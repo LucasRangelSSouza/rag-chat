@@ -112,7 +112,10 @@ class Engine:
         cov = msg["coverage"].format(profile=names, release=", ".join(sorted({c.release for c in selected})), cutoff=", ".join(cutoffs))
         text = None
         if self._model_ready():
-            text = self.model.complete(question, tagged)
+            language = "Brazilian Portuguese" if lang == "pt" else "English"
+            text = self.model.complete(f"{question}\n\n(Answer in {language}.)", tagged)
+        if text and len(CITE.sub("", text).strip(" .,;:\n")) < 40:
+            text = None  # a reply that is little more than citation tags tells the reader nothing
         if text and text != "NO_ANSWER":
             used = {int(n) for n in CITE.findall(text)}
             if used and used <= set(range(1, len(tagged) + 1)):

@@ -64,7 +64,7 @@ def test_model_citations_must_be_returned_chunks(engine):
 
     class Good(Bad):
         def complete(self, q, ctx):
-            return "Há merenda [C1]"
+            return "Há merenda escolar na rede municipal de Exemplo/GO [C1]"
 
     engine.model = Good()
     out = engine.answer("merenda escolar", ["pncp"])
@@ -329,3 +329,24 @@ def test_router_falls_back_to_keywords_without_a_model():
     assert route("How many notices mention school meals?", None, ["x"]).aggregate is True
     assert route("Quais editais de merenda escolar?", None, ["x"]).aggregate is False
     assert route("Quais editais de merenda escolar?", None, ["x"]).in_scope is True
+
+
+def test_a_reply_made_only_of_tags_falls_back_to_the_cited_records(engine):
+    class Model:
+        def ready(self): return True
+        def complete(self, q, ctx): return "[C1]"
+    engine.model = Model()
+    out = engine.answer("Quais compras de merenda escolar existem?", ["pncp"])
+    assert out["status"] == "answered" and "1-1-1/2026" in out["answer"]
+
+
+def test_the_model_is_told_which_language_to_answer_in(engine):
+    seen = {}
+    class Model:
+        def ready(self): return True
+        def complete(self, q, ctx):
+            seen["q"] = q
+            return "A Prefeitura de Exemplo/GO compra merenda escolar para a rede municipal [C1]."
+    engine.model = Model()
+    engine.answer("Quais compras de merenda escolar existem?", ["pncp"])
+    assert seen["q"].endswith("(Answer in Brazilian Portuguese.)")

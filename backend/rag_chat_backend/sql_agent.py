@@ -108,7 +108,8 @@ class SqlStore:
 
     def ask(self, question: str, model) -> dict:
         """Ask the model for SQL, run it, repair once on a database error. Returns {sql, columns, rows, explanation} or {error}."""
-        prompt = f"{self.schema_text()}\n\nQuestion: {question}"
+        notes = f"\n\nNotes about these tables:\n{self.notes}" if self.notes else ""
+        prompt = f"{self.schema_text()}{notes}\n\nQuestion: {question}"
         feedback = ""
         for _ in range(2):
             reply = model.chat_json(SYSTEM, prompt + feedback)
@@ -125,6 +126,9 @@ class SqlStore:
                         "explanation": str(reply.get("explanation", ""))[:300]}
             except UnsafeSql as error:
                 feedback = f"\n\nYour previous query was rejected: {error}. Write a corrected single SELECT."
+            except self._psycopg.errors.QueryCanceled:
+                feedback = ("\n\nYour previous query was too slow and was cancelled. Narrow it: filter by year first, avoid "
+                            "functions on indexed columns, and search text with a single ILIKE pattern.")
             except Exception as error:  # noqa: BLE001
                 feedback = f"\n\nYour previous query failed with: {str(error)[:200]}. Write a corrected query."
         return {"error": "the model could not produce a valid query"}

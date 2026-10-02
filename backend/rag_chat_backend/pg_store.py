@@ -101,15 +101,19 @@ class PgStore:
         query = tsquery(_groups(question))
         if not query:
             return 0, []
-        _, counted = self._run(
-            f"SELECT count(*) FROM (SELECT 1 FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s) LIMIT 100000) m", (query,))
-        total = int(counted[0][0])
-        if not total:
+        try:
+            _, counted = self._run(
+                f"SELECT count(*) FROM (SELECT 1 FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s) LIMIT 20000) m", (query,))
+            total = int(counted[0][0])
+            if not total:
+                return 0, []
+            _, rows = self._run(
+                f"WITH m AS (SELECT numero_controle_pncp, fts FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s) LIMIT 20000) "
+                f"SELECT numero_controle_pncp FROM m ORDER BY ts_rank_cd(fts, to_tsquery('portuguese', %s)) DESC LIMIT %s",
+                (query, query, limit))
+        except self._psycopg.errors.QueryCanceled:
+            # Very common terms match too many notices to rank in time; vector search still answers.
             return 0, []
-        _, rows = self._run(
-            f"WITH m AS (SELECT numero_controle_pncp, fts FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s) LIMIT 20000) "
-            f"SELECT numero_controle_pncp FROM m ORDER BY ts_rank_cd(fts, to_tsquery('portuguese', %s)) DESC LIMIT %s",
-            (query, query, limit))
         return total, [r[0] for r in rows]
 
     def _vector_ids(self, question: str, limit: int) -> list[str]:

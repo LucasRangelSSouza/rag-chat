@@ -77,7 +77,7 @@ class SqlStore:
 
     def _connect(self):
         return self._psycopg.connect(self.dsn, autocommit=True, connect_timeout=5,
-                                     options="-c default_transaction_read_only=on -c statement_timeout=10000")
+                                     options="-c default_transaction_read_only=on -c statement_timeout=25000")
 
     def schema_text(self) -> str:
         if self._schema_text is None:

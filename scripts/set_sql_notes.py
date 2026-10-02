@@ -20,7 +20,10 @@ PNCP_SQL = (
     "were excluded. "
     "obt_pncp_atas has one row per price registration (ata): ano_ata, cancelado, objeto_contratacao, nome_orgao. "
     "Return names, never only codes, and always select the measure (the count or the sum) next to the names. "
-    "'Por estado' or 'by state' means GROUP BY sigla_uf; orgao_esfera_id is the level of government, not the state."
+    "'Por estado' or 'by state' means GROUP BY sigla_uf; orgao_esfera_id is the level of government, not the state. "
+    "Filter places with sigla_uf, which is indexed together with ano_contrato; never filter by nome_regiao, which is slow. "
+    "Regions as states: Norte AC, AM, AP, PA, RO, RR, TO; Nordeste AL, BA, CE, MA, PB, PE, PI, RN, SE; Centro-Oeste DF, GO, "
+    "MS, MT; Sudeste ES, MG, RJ, SP; Sul PR, RS, SC."
 )
 
 SIOPE_EXTRA = (

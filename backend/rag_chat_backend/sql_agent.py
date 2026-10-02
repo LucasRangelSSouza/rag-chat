@@ -117,6 +117,11 @@ class SqlStore:
                 return {"error": (reply or {}).get("explanation") or "no query"}
             try:
                 columns, rows = self.run(reply["sql"])
+                if rows and all(v is None for row in rows for v in row) and not feedback:
+                    # Only NULLs usually means a filter value that does not exist (a name spelled differently).
+                    feedback = ("\n\nYour previous query returned only NULL values. A filter value probably does not match the "
+                                "data: check the exact spelling and format of names and categories, then write a corrected query.")
+                    continue
                 if not rows and not feedback:
                     # An empty answer is usually a wrong filter or table, so ask once for another approach.
                     feedback = ("\n\nYour previous query returned no rows. Check the filters (values, years, period) and "

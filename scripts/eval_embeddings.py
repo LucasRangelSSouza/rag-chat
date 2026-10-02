@@ -41,7 +41,9 @@ def search(table: str, vectors_path: str, out_path: str, k: int = 10) -> None:
     items = json.load(open(vectors_path, encoding="utf-8"))
     results = []
     with psycopg.connect(os.environ["RAG_DATABASE_URL"], autocommit=True) as conn, conn.cursor() as cur:
-        cur.execute("SET ivfflat.probes = 12")  # same setting as the chat (pg_store.py)
+        # probes=12 is the chat's setting (pg_store.py); PROBES=1100 visits every list, which makes the search exact.
+        cur.execute(f"SET ivfflat.probes = {int(os.environ.get('PROBES', '12'))}")
+        cur.execute("SET statement_timeout = 0")  # an exact scan over 1.25M vectors takes longer than the chat's limit
         for item in items:
             literal = "[" + ",".join(f"{v:.6f}" for v in item["vector"]) + "]"
             start = time.perf_counter()
@@ -49,7 +51,7 @@ def search(table: str, vectors_path: str, out_path: str, k: int = 10) -> None:
             ids = [r[0] for r in cur.fetchall()]
             results.append({"id": item["id"], "query": item["query"], "rank": ids.index(item["id"]) + 1 if item["id"] in ids else None,
                             "embed_ms": item["embed_ms"], "search_ms": round((time.perf_counter() - start) * 1000, 1), "top": ids[:5]})
-    json.dump({"table": table, "k": k, "results": results}, open(out_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    json.dump({"table": table, "k": k, "probes": int(os.environ.get("PROBES", "12")), "results": results}, open(out_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     found = sum(r["rank"] is not None for r in results)
     print(f"{table}: target in top {k} for {found} of {len(results)} queries")
 

@@ -59,6 +59,7 @@ def validate_sql(sql: str, allowed: set[str]) -> str:
 SYSTEM = ("You write one PostgreSQL SELECT statement that answers the user's question over the tables described below. "
           "Rules: one statement, SELECT only, use only the listed tables and columns, qualify tables with their schema, "
           "aggregate and ORDER BY when the question asks for a ranking or total, and add LIMIT 50 at most. "
+          "Whenever a result has several rows, order them by the main measure, largest first, so the rows read as a ranking. "
           "When the question asks for several numbers at once (for example a count, a total and a top three), return all of "
           "them in one result: one row per ranked item with the overall totals repeated as extra columns (window functions "
           "such as SUM(...) OVER () or a CTE). "

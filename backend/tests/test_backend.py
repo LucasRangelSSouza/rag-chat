@@ -350,3 +350,12 @@ def test_the_model_is_told_which_language_to_answer_in(engine):
     engine.model = Model()
     engine.answer("Quais compras de merenda escolar existem?", ["pncp"])
     assert seen["q"].endswith("(Answer in Brazilian Portuguese.)")
+
+
+def test_state_filter_reads_names_and_upper_case_codes_only():
+    from rag_chat_backend.pg_store import state_filter
+    assert state_filter("Editais para reforma de escolas em São Paulo") == ("SP", "Editais para reforma de escolas")
+    assert state_filter("Transporte escolar em Mato Grosso do Sul")[0] == "MS"
+    assert state_filter("merenda em GO")[0] == "GO"
+    assert state_filter("compra para o setor de licitação")[0] is None
+    assert state_filter("Editais de software de gestão pública")[0] is None

@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 import threading
+import unicodedata
 import urllib.request
 from typing import Any
 
@@ -20,6 +21,43 @@ RECORD_COLUMNS = ["numero_controle_pncp", "ano_compra", "data_publicacao_pncp", 
                   "categoria_area", "valor_total_estimado"]
 _SAFE = re.compile(r"^[a-z0-9]+$")
 _ID = re.compile(r"^(\d{14})-\d-(\d+)/(\d{4})$")
+
+_STATES = {
+    "acre": "AC", "alagoas": "AL", "amapa": "AP", "amazonas": "AM", "bahia": "BA", "ceara": "CE", "distrito federal": "DF",
+    "espirito santo": "ES", "goias": "GO", "maranhao": "MA", "mato grosso do sul": "MS", "mato grosso": "MT",
+    "minas gerais": "MG", "para": "PA", "paraiba": "PB", "parana": "PR", "pernambuco": "PE", "piaui": "PI",
+    "rio de janeiro": "RJ", "rio grande do norte": "RN", "rio grande do sul": "RS", "rondonia": "RO", "roraima": "RR",
+    "santa catarina": "SC", "sao paulo": "SP", "sergipe": "SE", "tocantins": "TO",
+}
+_UFS = set(_STATES.values())
+
+
+def _fold(text: str) -> str:
+    return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+
+
+def state_filter(question: str) -> tuple[str | None, str]:
+    """Return (UF, question without the place) when the question names one Brazilian state, else (None, question).
+
+    Longer names are tried first so "mato grosso do sul" wins over "mato grosso"; a bare two-letter code counts only
+    in upper case ("em GO", "/SP"), so the Portuguese words "para" and "pe" do not trigger a filter on their own.
+    """
+    folded = _fold(question)
+    if len(folded) != len(question):
+        folded = question.lower()
+    for name in sorted(_STATES, key=len, reverse=True):
+        if name == "para":
+            pattern = r"\b(?:no|do|estado do) para\b"
+        else:
+            pattern = rf"\b(?:(?:em|no|na|do|da|de|in|estado (?:de|do|da)) )?{name}\b"
+        match = re.search(pattern, folded)
+        if match:
+            # Folding drops only combining marks, so positions in the folded text match the original question.
+            return _STATES[name], (question[:match.start()] + question[match.end():]).strip()
+    match = re.search(r"(?:\b(?:em|no|na|in)\s+|/)([A-Z]{2})\b", question)
+    if match and match.group(1) in _UFS:
+        return match.group(1), (question[:match.start()] + question[match.end():]).strip()
+    return None, question
 
 
 def tsquery(groups: list[list[str]]) -> str:
@@ -97,36 +135,45 @@ class PgStore:
         except Exception:
             return None
 
-    def _text_ids(self, question: str, limit: int) -> tuple[int, list[str]]:
+    def _text_ids(self, question: str, limit: int, uf: str | None = None) -> tuple[int, list[str]]:
         query = tsquery(_groups(question))
         if not query:
             return 0, []
+        where_uf, uf_args = (" AND sigla_uf = %s", (uf,)) if uf else ("", ())
         try:
             _, counted = self._run(
-                f"SELECT count(*) FROM (SELECT 1 FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s) LIMIT 20000) m", (query,))
+                f"SELECT count(*) FROM (SELECT 1 FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s){where_uf} LIMIT 20000) m",
+                (query, *uf_args))
             total = int(counted[0][0])
             if not total:
                 return 0, []
             _, rows = self._run(
-                f"WITH m AS (SELECT numero_controle_pncp, fts FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s) LIMIT 20000) "
+                f"WITH m AS (SELECT numero_controle_pncp, fts FROM {self.table} WHERE fts @@ to_tsquery('portuguese', %s){where_uf} LIMIT 20000) "
                 f"SELECT numero_controle_pncp FROM m ORDER BY ts_rank_cd(fts, to_tsquery('portuguese', %s)) DESC LIMIT %s",
-                (query, query, limit))
+                (query, *uf_args, query, limit))
         except self._psycopg.errors.QueryCanceled:
             # Very common terms match too many notices to rank in time; vector search still answers.
             return 0, []
         return total, [r[0] for r in rows]
 
-    def _vector_ids(self, question: str, limit: int) -> list[str]:
+    def _vector_ids(self, question: str, limit: int, uf: str | None = None) -> list[str]:
         vector = self.embed(question)
         if vector is None:
             return []
         literal = "[" + ",".join(f"{v:.6f}" for v in vector) + "]"
         try:
             _, rows = self._run(
-                f"SELECT numero_controle_pncp FROM {self.vectors_table} ORDER BY embedding <=> %s::halfvec LIMIT %s", (literal, limit))
+                f"SELECT numero_controle_pncp FROM {self.vectors_table} ORDER BY embedding <=> %s::halfvec LIMIT %s",
+                (literal, limit * 8 if uf else limit))
+            ids = [r[0] for r in rows]
+            if uf and ids:
+                _, kept = self._run(f"SELECT numero_controle_pncp FROM {self.table} WHERE numero_controle_pncp = ANY(%s) AND sigla_uf = %s",
+                                    (ids, uf))
+                allowed = {r[0] for r in kept}
+                ids = [i for i in ids if i in allowed][:limit]
         except Exception:
             return []
-        return [r[0] for r in rows]
+        return ids
 
     def _records(self, ids: list[str]) -> dict[str, dict]:
         if not ids:
@@ -137,8 +184,9 @@ class PgStore:
 
     def search(self, question: str, k: int = 5) -> tuple[int, list[dict]]:
         """Hybrid retrieval for the chat: text ranking fused with vector ranking when embeddings are available."""
-        total, text_ids = self._text_ids(question, 25)
-        vector_ids = self._vector_ids(question, 25)
+        uf, topic = state_filter(question)
+        total, text_ids = self._text_ids(topic, 25, uf)
+        vector_ids = self._vector_ids(question, 25, uf)
         ordered = fuse([r for r in (text_ids, vector_ids) if r])[:k]
         records = self._records(ordered)
         hits = [records[i] for i in ordered if i in records]

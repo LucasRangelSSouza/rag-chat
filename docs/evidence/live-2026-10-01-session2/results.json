@@ -1,0 +1,68 @@
+{
+ "chat": "https://rag.rangeltech.net",
+ "at": "2026-10-01T23:52:10.836Z",
+ "answered": 10,
+ "total": 10,
+ "log": [
+  {
+   "label": "PNCP text+vector",
+   "question": "Quais licitações de transporte escolar existem nos registros?",
+   "outcome": "answered",
+   "seconds": 12
+  },
+  {
+   "label": "PNCP SQL",
+   "question": "Which municipality signed the most contracts in 2025?",
+   "outcome": "answered",
+   "seconds": 32
+  },
+  {
+   "label": "SIOPE SQL",
+   "question": "What was the median education investment per student in 2023, by region?",
+   "outcome": "answered",
+   "seconds": 9
+  },
+  {
+   "label": "combined 1",
+   "question": "Which municipality signed the most contracts in 2025?",
+   "outcome": "answered",
+   "seconds": 36
+  },
+  {
+   "label": "combined 2",
+   "question": "E sobre editais de merenda escolar, o que aparece nos registros?",
+   "outcome": "answered",
+   "seconds": 30
+  },
+  {
+   "label": "combined 3",
+   "question": "How many municipalities reported to SIOPE in 2024?",
+   "outcome": "answered",
+   "seconds": 9
+  },
+  {
+   "label": "long 4",
+   "question": "Resuma em uma frase o que você encontrou sobre merenda escolar.",
+   "outcome": "answered",
+   "seconds": 38
+  },
+  {
+   "label": "long 5",
+   "question": "Which region had the highest median investment per student in 2023?",
+   "outcome": "answered",
+   "seconds": 11
+  },
+  {
+   "label": "long 6",
+   "question": "Quais editais de uniforme escolar existem?",
+   "outcome": "answered",
+   "seconds": 37
+  },
+  {
+   "label": "long 7",
+   "question": "What is the capital of France?",
+   "outcome": "answered",
+   "seconds": 11
+  }
+ ]
+}

@@ -256,3 +256,76 @@ def test_dates_and_decimals_serialise_instead_of_failing_the_answer():
     payload = {"published": datetime.date(2026, 7, 31), "at": datetime.datetime(2026, 7, 31, 12, 0), "n": decimal.Decimal("1.5")}
     text = json.dumps(payload, default=_json_default)
     assert "2026-07-31" in text and "1.5" in text
+
+
+class _RoutingModel:
+    """Fake model: routes by a fixed table, writes no free text, so the engine's own decisions are visible."""
+    def __init__(self, routes):
+        self.routes, self.complete_calls = routes, 0
+    def ready(self): return True
+    def chat_json(self, system, user):
+        if system.startswith("You route"):
+            return next((r for q, r in self.routes.items() if q in user), None)
+        return None
+    def complete(self, q, ctx):
+        self.complete_calls += 1
+        return None
+
+
+class _FakeSql:
+    is_sql = True
+    def __init__(self, rows): self.rows, self.asked = rows, 0
+    def meta(self): return {"data_cutoff": "2025-12-31", "record_count": None}
+    def ask(self, question, model):
+        self.asked += 1
+        if not self.rows:
+            return {"error": "no query"}
+        return {"sql": "SELECT municipio, count(*) n FROM pncp.contratos GROUP BY 1 ORDER BY 2 DESC LIMIT 1",
+                "columns": ["municipio", "n"], "rows": self.rows, "explanation": "Most contracts"}
+
+
+def test_aggregate_question_with_all_bases_is_answered_by_sql_not_by_notices(engine):
+    q = "Qual município assinou mais contratos em 2025 com merenda escolar?"
+    sql = _FakeSql([["São Paulo", 1234]])
+    engine.corpora["contratos"] = Corpus("contratos", "PNCP contracts", sql, "owner/pncp-analytics", "v1", None)
+    engine.model = _RoutingModel({q: {"scope": "in", "kind": "aggregate"}})
+    out = engine.answer(q, ["pncp", "contratos"])
+    assert sql.asked == 1
+    assert [c["chunk_id"] for c in out["citations"]] == ["C1:sql"]  # no text-retrieval notices mixed in
+    assert "1234" in out["answer"]
+
+
+def test_aggregate_question_abstains_when_sql_finds_nothing_instead_of_listing_notices(engine):
+    q = "Quantos municípios declararam merenda escolar ao SIOPE em 2024?"
+    engine.corpora["siope"] = Corpus("siope", "SIOPE", _FakeSql([]), "owner/siope-analytics", "v1", None)
+    engine.model = _RoutingModel({q: {"scope": "in", "kind": "aggregate"}})
+    out = engine.answer(q, ["pncp", "siope"])
+    assert out["status"] == "abstained" and out["citations"] == []
+    assert "SQL" in out["answer"]
+
+
+def test_off_topic_question_is_declined_before_retrieval(engine):
+    q = "Qual é a capital da França?"
+    sql = _FakeSql([["x", 1]])
+    engine.corpora["siope"] = Corpus("siope", "SIOPE", sql, "owner/siope-analytics", "v1", None)
+    engine.model = _RoutingModel({q: {"scope": "out", "kind": "records"}})
+    out = engine.answer(q, ["pncp", "siope"])
+    assert out["status"] == "abstained" and out["safety_reason"] == "off_topic" and sql.asked == 0
+
+
+def test_records_question_skips_sql_when_retrieval_finds_records(engine):
+    q = "Quais compras de merenda escolar existem?"
+    sql = _FakeSql([["x", 1]])
+    engine.corpora["siope"] = Corpus("siope", "SIOPE", sql, "owner/siope-analytics", "v1", None)
+    engine.model = _RoutingModel({q: {"scope": "in", "kind": "records"}})
+    out = engine.answer(q, ["pncp", "siope"])
+    assert out["status"] == "answered" and sql.asked == 0
+    assert out["citations"][0]["document_id"] == "1-1-1/2026"
+
+
+def test_router_falls_back_to_keywords_without_a_model():
+    from rag_chat_backend.router import route
+    assert route("Quantos contratos em 2025?", None, ["x"]).aggregate is True
+    assert route("How many notices mention school meals?", None, ["x"]).aggregate is True
+    assert route("Quais editais de merenda escolar?", None, ["x"]).aggregate is False
+    assert route("Quais editais de merenda escolar?", None, ["x"]).in_scope is True

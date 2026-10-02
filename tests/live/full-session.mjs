@@ -24,28 +24,28 @@ async function select(indexes) {
     if ((await boxes.nth(i).isChecked()) !== want) want ? await boxes.nth(i).check() : await boxes.nth(i).uncheck();
   }
 }
-/** Sends a question and waits for the assistant turn to settle. Returns the visible status and seconds. */
+const count = (text, re) => (text.match(re) || []).length;
+const ERR = /research service is unavailable|could not answer right now|limit|Many people|Wait for your running/gi;
+const DONE = /Coverage:|Cobertura:|SQL and result|did not find|no record|não encontr|insufficient|evidence is not enough/gi;
+
+/** Sends a question and waits until a new answer or error is rendered. Returns the outcome and the seconds taken. */
 async function ask(label, question, shot) {
-  const before = await page.locator("[data-role='assistant'], article, [class*='assistant']").count().catch(() => 0);
-  const box = page.getByPlaceholder(/ask about/i);
-  await box.fill(question);
+  const before = await page.locator("main").innerText();
+  const e0 = count(before, ERR), d0 = count(before, DONE);
+  await page.getByPlaceholder(/ask about/i).fill(question);
   const started = Date.now();
   await page.getByRole("button", { name: "Send question" }).click();
   let outcome = "timeout";
-  const deadline = Date.now() + 170000;
-  while (Date.now() < deadline) {
+  while (Date.now() - started < 170000) {
     await page.waitForTimeout(1500);
-    const text = await page.locator("main").innerText();
-    if (/research service is unavailable|could not answer|Service unavailable|daily limit|question limit|Many people/i.test(text.slice(-1500))) { outcome = "error"; break; }
-    if (/Coverage|Cobertura|SQL and result|could not find|Not enough evidence|Sem evid/i.test(text.slice(-4000))) {
-      const stillThinking = await page.getByText(/Searching|Thinking|Retrieving|Pensando/i).count();
-      if (!stillThinking) { outcome = "answered"; break; }
-    }
+    const now = await page.locator("main").innerText();
+    if (count(now, ERR) > e0) { outcome = "error"; break; }
+    if (count(now, DONE) > d0) { outcome = "answered"; break; }
   }
   const seconds = Math.round((Date.now() - started) / 1000);
-  const tail = (await page.locator("main").innerText()).replace(/\s+/g, " ").slice(-420);
+  await page.waitForTimeout(1500);
   await page.screenshot({ path: `${OUT}/${shot}.png`, fullPage: true });
-  log.push({ label, question, outcome, seconds, tail });
+  log.push({ label, question, outcome, seconds });
   console.log(label, outcome, seconds + "s");
 }
 async function fresh() {

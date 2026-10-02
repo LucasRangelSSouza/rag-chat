@@ -1,0 +1,78 @@
+{
+ "chat": "https://rag.rangeltech.net",
+ "at": "2026-10-01T23:24:48.623Z",
+ "answered": 6,
+ "total": 10,
+ "log": [
+  {
+   "label": "PNCP text+vector",
+   "question": "Quais licitações de transporte escolar existem nos registros?",
+   "outcome": "error",
+   "seconds": 17,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "PNCP SQL",
+   "question": "Which municipality signed the most contracts in 2025?",
+   "outcome": "timeout",
+   "seconds": 171,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "SIOPE SQL",
+   "question": "What was the median education investment per student in 2023, by region?",
+   "outcome": "answered",
+   "seconds": 11,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "combined 1",
+   "question": "Which municipality signed the most contracts in 2025?",
+   "outcome": "answered",
+   "seconds": 41,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "combined 2",
+   "question": "E sobre editais de merenda escolar, o que aparece nos registros?",
+   "outcome": "error",
+   "seconds": 31,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "combined 3",
+   "question": "How many municipalities reported to SIOPE in 2024?",
+   "outcome": "error",
+   "seconds": 2,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "long 4",
+   "question": "Resuma em uma frase o que você encontrou sobre merenda escolar.",
+   "outcome": "answered",
+   "seconds": 46,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "long 5",
+   "question": "Which region had the highest median investment per student in 2023?",
+   "outcome": "answered",
+   "seconds": 21,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "long 6",
+   "question": "Quais editais de uniforme escolar existem?",
+   "outcome": "answered",
+   "seconds": 40,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  },
+  {
+   "label": "long 7",
+   "question": "What is the capital of France?",
+   "outcome": "answered",
+   "seconds": 14,
+   "tail": " records before relying on an answer. Wording comes from a Qwen-based checkpoint (an abliterated variant published by a third party), served with reasoning capability for this constrained procurement-analysis workflow. It is an implementation case study, not an authoritative source or an unrestricted assistant. RAG Chat · A public research prototype by Lucas Rangel Interface repository · Model case · Kaggle catalogue"
+  }
+ ]
+}

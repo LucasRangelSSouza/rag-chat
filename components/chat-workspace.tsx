@@ -266,7 +266,9 @@ export function ChatWorkspace() {
         body: JSON.stringify({
           question: prompt,
           corpora: bases ?? selected,
-          history: messages.filter((m) => m.role === "user").slice(-4).map((m) => m.text.slice(0, 1000)),
+          history: messages
+            .flatMap((m, i) => (m.role === "user" ? [`Q: ${m.text.slice(0, 300)}\nA: ${(messages[i + 1]?.role === "assistant" ? messages[i + 1].text : "").slice(0, 600)}`] : []))
+            .slice(-4),
         }),
       });
       const payload = await response.json();

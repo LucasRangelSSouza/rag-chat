@@ -67,6 +67,21 @@ class QwenClient:
         except Exception:
             return None
 
+    def summarize(self, turns: list[str], language: str) -> str | None:
+        """Recap of the earlier turns of a conversation; the caller labels it as drawn from those answers."""
+        body = {"model": self.model, "temperature": 0.2, "max_tokens": 500, "chat_template_kwargs": {"enable_thinking": False},
+                "messages": [{"role": "system", "content": (
+                    "Summarize the research conversation below as a short bullet list in " + language + ". Use only what the "
+                    "earlier answers say, keep every number exactly as written, and do not add facts.")},
+                             {"role": "user", "content": "\n\n".join(turns)}]}
+        req = urllib.request.Request(f"{self.base_url}/chat/completions", data=json.dumps(body).encode(), headers=self._headers(json_body=True))
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                text = json.load(resp)["choices"][0]["message"]["content"] or ""
+                return re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip() or None
+        except Exception:
+            return None
+
     def general(self, question: str) -> str | None:
         """Short answer with no retrieval; the caller labels it as not grounded in any source."""
         body = {"model": self.model, "temperature": 0.3, "max_tokens": 400,

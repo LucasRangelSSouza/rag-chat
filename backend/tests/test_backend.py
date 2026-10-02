@@ -411,3 +411,18 @@ def test_mixed_question_runs_retrieval_and_sql(engine):
     out = engine.answer(q, ["pncp", "siope"])
     ids = [c["chunk_id"] for c in out["citations"]]
     assert sql.asked == 1 and any(i.endswith(":sql") for i in ids) and any(not i.endswith(":sql") for i in ids)
+
+
+def test_recap_reads_earlier_answers_instead_of_searching(engine):
+    class Model:
+        def ready(self): return True
+        def chat_json(self, system, user):
+            return {"scope": "in", "kind": "summary", "standalone": "Resuma a conversa", "bases": ["pncp"]}
+        def summarize(self, turns, language):
+            return "- Exemplo/GO compra merenda escolar."
+        def complete(self, q, ctx):
+            raise AssertionError("a recap must not search")
+    engine.model = Model()
+    out = engine.answer("Resuma a conversa", ["pncp"], history=["Q: Quais compras de merenda?\nA: Exemplo/GO compra merenda [C1]."])
+    assert out["status"] == "answered" and out["grounded"] is False and out["citations"] == []
+    assert out["answer"].startswith("- Exemplo/GO")

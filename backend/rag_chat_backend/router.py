@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 
 ROUTE_SYSTEM = (
     "You route questions for a research chat over Brazilian public data. The selected bases are listed below with their ids, "
-    "followed by the earlier questions of the conversation, oldest first, and the new question. Decide: "
+    "followed by the earlier turns of the conversation (question and the start of the answer), oldest first, and the new question. Decide: "
     "scope: \"in\" when the new question asks about the data in those bases (procurement notices, contracts, suppliers, "
     "public bodies, municipalities, education spending, or the bases themselves) or follows up on an earlier question, "
     "\"out\" when it asks about anything else (general knowledge, other countries, chit-chat, coding help). "
@@ -26,13 +26,15 @@ ROUTE_SYSTEM = (
     "out (place, year, topic) from the earlier questions; repeat it unchanged when it already stands alone. "
     "kind: \"aggregate\" when the answer is a number or a ranking computed over many records (how many, total, sum, average, "
     "median, which has the most or least, top N, share, comparison of totals), \"records\" when the answer is specific "
-    "records or their content, \"mixed\" when the question asks for both. "
-    "numeric_part: when kind is \"mixed\", the part of the standalone question that asks for the number, written as a "
-    "complete question; otherwise an empty string. "
+    "records or their content, \"mixed\" when the question asks for both, \"summary\" when the user asks to summarize or "
+    "recap the conversation so far. "
+    "numeric_part: when kind is \"mixed\", the part of the standalone question that asks for numbers, counts, totals, "
+    "rankings or top N lists, written as one complete question; otherwise an empty string. Rankings of municipalities, "
+    "bodies or suppliers by count or value are numeric, not records. "
     "bases: the ids of the selected bases needed to answer; notice search answers records about published notices, the "
     "contracts base answers counts and values of contracts and price registrations, the education base answers education "
     "spending by municipality. "
-    "Answer with JSON only: {\"scope\": \"in\"|\"out\", \"standalone\": \"...\", \"kind\": \"aggregate\"|\"records\"|\"mixed\", "
+    "Answer with JSON only: {\"scope\": \"in\"|\"out\", \"standalone\": \"...\", \"kind\": \"aggregate\"|\"records\"|\"mixed\"|\"summary\", "
     "\"numeric_part\": \"...\", \"bases\": [\"id\", ...]}."
 )
 
@@ -52,6 +54,7 @@ class Route:
     standalone: str = ""
     bases: tuple[str, ...] = field(default_factory=tuple)
     numeric_part: str = ""
+    summary: bool = False
 
 
 def _fold(text: str) -> str:
@@ -76,11 +79,11 @@ def route(question: str, model, bases: list[tuple[str, str]] | list[str], histor
     prompt = ("Selected bases:\n" + "\n".join(f"- {i}: {label}" for i, label in pairs)
               + f"\n\nEarlier questions:\n{earlier}\n\nNew question: {question}")
     reply = model.chat_json(ROUTE_SYSTEM, prompt)
-    if not reply or reply.get("scope") not in {"in", "out"} or reply.get("kind") not in {"aggregate", "records", "mixed"}:
+    if not reply or reply.get("scope") not in {"in", "out"} or reply.get("kind") not in {"aggregate", "records", "mixed", "summary"}:
         return keyword_route(question, ids)
     standalone = reply.get("standalone") if isinstance(reply.get("standalone"), str) and reply["standalone"].strip() else question
     chosen = tuple(b for b in (reply.get("bases") or []) if b in ids) or tuple(ids)
     numeric = reply.get("numeric_part") if isinstance(reply.get("numeric_part"), str) else ""
     return Route(in_scope=reply["scope"] == "in", aggregate=reply["kind"] in {"aggregate", "mixed"}, by_model=True,
                  mixed=reply["kind"] == "mixed", standalone=standalone.strip()[:1000], bases=chosen,
-                 numeric_part=numeric.strip()[:1000])
+                 numeric_part=numeric.strip()[:1000], summary=reply["kind"] == "summary" and bool(history))

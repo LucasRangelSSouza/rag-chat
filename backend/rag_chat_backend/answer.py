@@ -126,6 +126,12 @@ class Engine:
         plan = route(question, self.model if self._model_ready() else None, [(c.id, c.label) for c in selected], history)
         if not plan.in_scope:
             return {"status": "abstained", "answer": msg["off_topic"], "citations": [], "safety_reason": "off_topic", "grounded": True}
+        if plan.summary and hasattr(self.model, "summarize"):
+            # A recap reads the earlier answers; it does not search again, so it carries no new sources.
+            text = self.model.summarize(history or [], "Brazilian Portuguese" if lang == "pt" else "English")
+            if text:
+                return {"status": "answered", "answer": f"{text}\n\n{msg['summary_note']}", "citations": [], "safety_reason": None,
+                        "grounded": False}
         query = plan.standalone or question  # a follow-up is searched and answered as the full question
         selected = [c for c in selected if c.id in plan.bases] or selected
         text_bases = [c for c in selected if not getattr(c.store, "is_sql", False)]
@@ -134,7 +140,8 @@ class Engine:
         if plan.mixed:
             # A question that asks for records and for a number gets both.
             total += self._retrieve(query, text_bases, msg, tagged, citations)
-            self._query(plan.numeric_part or query, sql_bases, tagged, citations)
+            # With no text base chosen, SQL is the only source, so it gets the whole question, rankings included.
+            self._query((plan.numeric_part if text_bases else "") or query, sql_bases, tagged, citations)
         else:
             # Aggregates go to SQL first; records go to retrieval first. The other side runs only if the first found nothing.
             order = ("sql", "text") if plan.aggregate and sql_bases else ("text", "sql")

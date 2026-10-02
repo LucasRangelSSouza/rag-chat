@@ -211,6 +211,9 @@ class Engine:
             if "error" in result or not result.get("rows"):
                 continue
             first = len(tagged) + 1
+            # The rows alone lose the filters (place, year, topic); the query and its explanation carry them.
+            tagged.append(f"[C{first}] Result of this query over {corpus.label}: {result['sql']} "
+                          f"(what it measures: {result.get('explanation', '')})")
             for row in result["rows"][:10]:
                 tagged.append(f"[C{first}] " + "; ".join(f"{col}={val}" for col, val in zip(result["columns"], row)))
             citations.append({"chunk_id": f"C{first}:sql", "document_id": corpus.id, "title": f"SQL over {corpus.label}"[:240],

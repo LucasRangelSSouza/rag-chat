@@ -5,7 +5,7 @@ import { chromium } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 const CHAT = process.env.CHAT_URL ?? "https://rag.rangeltech.net";
-const SITE = process.env.SITE_URL ?? "https://rangeltech.net";
+const SITE = process.env.SITE_URL ?? "https://lucas.rangeltech.net";
 const OUT = process.argv[2] ?? "docs/evidence/live";
 mkdirSync(OUT, { recursive: true });
 

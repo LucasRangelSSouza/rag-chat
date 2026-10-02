@@ -31,6 +31,10 @@ PNCP_SQL = (
 )
 
 SIOPE_EXTRA = (
+    " For per-student questions use bi.siope_por_aluno, which already has nome_municipio. To list or look up indicators use "
+    "siope.dim_indicador (codigo_indicador, nome_indicador), never a DISTINCT over the large indicator table. Expense values "
+    "in obt_fnde_siope_despesa_funcao_municipio_ano and obt_fnde_siope_dados_gerais_municipio_ano accumulate over the year "
+    "by num_periodo: use only the highest num_periodo per municipality and year, never a sum across periods."
     " Years available: 2021 to 2025 only (2025 partial); when a question asks for earlier years, answer with the years that "
     "exist. Always return municipality names (nome_municipio from obt_ibge_municipio or from the siope tables), never only "
     "codes. Match names without accents and in upper case on both sides: public.f_unaccent(upper(nome_municipio)) = "
@@ -55,6 +59,9 @@ def main(path: str) -> None:
                 if base["id"] == "pncp-sql":
                     base["notes"] = PNCP_SQL
                 elif base["id"] == "siope":
+                    for table in ("bi.siope_por_aluno", "siope.dim_indicador"):
+                        if table not in base["tables"]:
+                            base["tables"].insert(0, table)
                     # Keep the original notes, replace any earlier version of the extra block.
                     base["notes"] = base.get("notes", "").split(" Years available:")[0] + SIOPE_EXTRA
             lines[i] = "RAG_EXTRA_CORPORA=" + json.dumps(corpora, ensure_ascii=False)

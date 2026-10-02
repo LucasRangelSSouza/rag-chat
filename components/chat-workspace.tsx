@@ -471,7 +471,7 @@ export function ChatWorkspace() {
                   value={question}
                   onChange={(event) => setQuestion(event.target.value.slice(0, 1000))}
                   onKeyDown={handleKeyDown}
-                  placeholder={health.status === "ready" ? "Ask about the released PNCP records…" : "Research will be available when the release is ready"}
+                  placeholder={health.status === "ready" ? "Ask anything, or about contracts, notices and education spending…" : "Research will be available when the release is ready"}
                   rows={1}
                   maxLength={1000}
                   disabled={pending || health.status !== "ready"}

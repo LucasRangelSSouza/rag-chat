@@ -125,7 +125,8 @@ class Engine:
             return self._ungrounded(question, msg)
         plan = route(question, self.model if self._model_ready() else None, [(c.id, c.label) for c in selected], history)
         if not plan.in_scope:
-            return {"status": "abstained", "answer": msg["off_topic"], "citations": [], "safety_reason": "off_topic", "grounded": True}
+            # Small talk and general questions get a plain conversational answer, labelled as using no sources.
+            return self._ungrounded(question, msg, history, fallback=msg["off_topic"])
         if plan.summary and hasattr(self.model, "summarize"):
             # A recap reads the earlier answers; it does not search again, so it carries no new sources.
             text = self.model.summarize(history or [], "Brazilian Portuguese" if lang == "pt" else "English")
@@ -222,11 +223,16 @@ class Engine:
                               "query": {"sql": result["sql"], "columns": result["columns"], "rows": result["rows"][:MAX_RESULT_ROWS],
                                         "explanation": result.get("explanation", "")}})
 
-    def _ungrounded(self, question: str, msg: dict) -> dict:
-        """No research base selected: a plain, short model answer with no retrieval and no citations."""
+    def _ungrounded(self, question: str, msg: dict, history: list[str] | None = None, fallback: str | None = None) -> dict:
+        """No base selected, or a question outside the bases: a plain model answer with no retrieval and no citations."""
+        declined = {"status": "abstained", "answer": fallback or msg["pick_base"], "citations": [],
+                    "safety_reason": "off_topic" if fallback else None, "grounded": False}
         if not self._model_ready() or not hasattr(self.model, "general"):
-            return {"status": "abstained", "answer": msg["pick_base"], "citations": [], "safety_reason": None, "grounded": False}
-        text = self.model.general(question)
+            return declined
+        try:
+            text = self.model.general(question, history)
+        except TypeError:  # a client without conversation support
+            text = self.model.general(question)
         if not text:
-            return {"status": "abstained", "answer": msg["pick_base"], "citations": [], "safety_reason": None, "grounded": False}
+            return declined
         return {"status": "answered", "answer": text, "citations": [], "safety_reason": None, "grounded": False}

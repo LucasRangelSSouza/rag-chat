@@ -313,6 +313,23 @@ def test_off_topic_question_is_declined_before_retrieval(engine):
     assert out["status"] == "abstained" and out["safety_reason"] == "off_topic" and sql.asked == 0
 
 
+def test_small_talk_gets_a_conversational_answer_without_sources(engine):
+    q = "bom dia"
+    sql = _FakeSql([["x", 1]])
+    engine.corpora["siope"] = Corpus("siope", "SIOPE", sql, "owner/siope-analytics", "v1", None)
+
+    class Chatty(_RoutingModel):
+        def general(self, question, history=None):
+            self.seen = (question, history)
+            return "Bom dia! Posso conversar ou pesquisar editais, contratos e gasto com educação."
+
+    engine.model = Chatty({q: {"scope": "out", "kind": "records"}})
+    out = engine.answer(q, ["pncp", "siope"], history=["Q: oi\nA: Olá!"])
+    assert out["status"] == "answered" and out["grounded"] is False and out["citations"] == []
+    assert out["answer"].startswith("Bom dia") and sql.asked == 0
+    assert engine.model.seen == (q, ["Q: oi\nA: Olá!"])
+
+
 def test_records_question_skips_sql_when_retrieval_finds_records(engine):
     q = "Quais compras de merenda escolar existem?"
     sql = _FakeSql([["x", 1]])

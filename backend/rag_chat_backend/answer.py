@@ -4,6 +4,7 @@ import re
 import threading
 import time
 from collections import OrderedDict
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -85,7 +86,7 @@ class Engine:
             c["dataset"]["manifest_sha256"] = corpus.manifest_sha256
         return c
 
-    def answer(self, question: str, corpus_ids: list[str] | None = None) -> dict:
+    def answer(self, question: str, corpus_ids: list[str] | None = None, history: list[str] | None = None) -> dict:
         """Answer with a short-lived cache, so a question asked again (a demo, a shared link) returns at once.
 
         Only model-written answers are cached: an extractive fallback from a moment when the model was down
@@ -93,6 +94,10 @@ class Engine:
         """
         key = (" ".join(question.lower().split()), tuple(sorted(set(corpus_ids or []))))
         now = time.monotonic()
+        if history:  # a follow-up depends on the conversation, so it is neither read from nor written to the cache
+            result = self._answer(question, corpus_ids, history)
+            result.pop("model_written", None)
+            return result
         with self._cache_lock:
             hit = self._cache.get(key)
             if hit and now - hit[0] < self.cache_seconds:
@@ -107,7 +112,7 @@ class Engine:
         result.pop("model_written", None)
         return result
 
-    def _answer(self, question: str, corpus_ids: list[str] | None = None) -> dict:
+    def _answer(self, question: str, corpus_ids: list[str] | None = None, history: list[str] | None = None) -> dict:
         lang = detect_language(question)
         msg = MESSAGES[lang]
         reason = check_question(question)
@@ -118,21 +123,28 @@ class Engine:
         selected = [self.corpora[c] for c in dict.fromkeys(corpus_ids or []) if c in self.corpora][:MAX_CORPORA]
         if not selected:
             return self._ungrounded(question, msg)
-        text_bases = [c for c in selected if not getattr(c.store, "is_sql", False)]
-        sql_bases = [c for c in selected if getattr(c.store, "is_sql", False)]
-        plan = route(question, self.model if self._model_ready() else None, [c.label for c in selected])
+        plan = route(question, self.model if self._model_ready() else None, [(c.id, c.label) for c in selected], history)
         if not plan.in_scope:
             return {"status": "abstained", "answer": msg["off_topic"], "citations": [], "safety_reason": "off_topic", "grounded": True}
+        query = plan.standalone or question  # a follow-up is searched and answered as the full question
+        selected = [c for c in selected if c.id in plan.bases] or selected
+        text_bases = [c for c in selected if not getattr(c.store, "is_sql", False)]
+        sql_bases = [c for c in selected if getattr(c.store, "is_sql", False)]
         tagged, citations, total = [], [], 0
-        # Aggregates go to SQL first; records go to retrieval first. The other side runs only if the first found nothing.
-        order = ("sql", "text") if plan.aggregate and sql_bases else ("text", "sql")
-        for step in order:
-            if tagged:
-                break
-            if step == "text":
-                total += self._retrieve(question, text_bases, msg, tagged, citations)
-            else:
-                self._query(question, sql_bases, tagged, citations)
+        if plan.mixed:
+            # A question that asks for records and for a number gets both.
+            total += self._retrieve(query, text_bases, msg, tagged, citations)
+            self._query(query, sql_bases, tagged, citations)
+        else:
+            # Aggregates go to SQL first; records go to retrieval first. The other side runs only if the first found nothing.
+            order = ("sql", "text") if plan.aggregate and sql_bases else ("text", "sql")
+            for step in order:
+                if tagged:
+                    break
+                if step == "text":
+                    total += self._retrieve(query, text_bases, msg, tagged, citations)
+                else:
+                    self._query(query, sql_bases, tagged, citations)
         if not tagged:
             reply = msg["needs_sql"] if plan.aggregate and sql_bases else msg["abstain"]
             return {"status": "abstained", "answer": reply, "citations": [], "safety_reason": None, "grounded": True}
@@ -142,7 +154,7 @@ class Engine:
         text = None
         if self._model_ready():
             language = "Brazilian Portuguese" if lang == "pt" else "English"
-            text = self.model.complete(f"{question}\n\n(Answer in {language}.)", tagged)
+            text = self.model.complete(f"{query}\n\n(Answer in {language}.)", tagged)
         if text and len(re.findall(r"\w+", CITE.sub("", text))) < 3:
             text = None  # a reply that is little more than citation tags tells the reader nothing
         if text and text != "NO_ANSWER":
@@ -177,11 +189,18 @@ class Engine:
         return total
 
     def _query(self, question: str, bases: list[Corpus], tagged: list[str], citations: list[dict]) -> None:
-        for corpus in bases:
+        def ask(corpus: Corpus) -> dict:
             try:
-                result = corpus.store.ask(question, self.model) if self._model_ready() else {"error": "the SQL agent needs the model"}
+                return corpus.store.ask(question, self.model) if self._model_ready() else {"error": "the SQL agent needs the model"}
             except Exception:  # a failing database or model must end in an abstention, not a server error
-                result = {"error": "the SQL agent failed"}
+                return {"error": "the SQL agent failed"}
+
+        if not bases:
+            return
+        # The SQL bases are independent, so they run at the same time; results keep the order of the bases.
+        with ThreadPoolExecutor(max_workers=len(bases)) as pool:
+            results = list(pool.map(ask, bases))
+        for corpus, result in zip(bases, results):
             if "error" in result or not result.get("rows"):
                 continue
             first = len(tagged) + 1

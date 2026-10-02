@@ -12,7 +12,7 @@ from .answer import Corpus, Engine
 from .index import open_index
 from .qwen import QwenClient
 
-MAX_BODY = 16 * 1024
+MAX_BODY = 24 * 1024
 
 
 def warm_index(path: Path) -> None:
@@ -116,11 +116,13 @@ def handler(engine: Engine):
                 body = json.loads(self.rfile.read(length))
                 question = body["question"]
                 corpora = body.get("corpora", [])
-                assert isinstance(question, str) and set(body) <= {"question", "corpora"}
+                history = body.get("history", [])
+                assert isinstance(question, str) and set(body) <= {"question", "corpora", "history"}
                 assert isinstance(corpora, list) and len(corpora) <= 5 and all(isinstance(c, str) and len(c) <= 40 for c in corpora)
+                assert isinstance(history, list) and len(history) <= 4 and all(isinstance(h, str) and len(h) <= 1000 for h in history)
             except Exception:
                 return self._send(400, {"error": "invalid request"})
-            self._send(200, engine.answer(question, corpora))
+            self._send(200, engine.answer(question, corpora, history))
 
         def log_message(self, *args):
             pass

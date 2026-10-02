@@ -262,7 +262,12 @@ export function ChatWorkspace() {
       const response = await fetch("/api/answer", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: prompt, corpora: bases ?? selected }),
+        // The last questions of this conversation let the backend understand a follow-up such as "and in 2023?".
+        body: JSON.stringify({
+          question: prompt,
+          corpora: bases ?? selected,
+          history: messages.filter((m) => m.role === "user").slice(-4).map((m) => m.text.slice(0, 1000)),
+        }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(typeof payload.error === "string" ? payload.error : "The research service is unavailable.");

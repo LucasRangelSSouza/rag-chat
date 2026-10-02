@@ -373,3 +373,41 @@ def test_model_answers_are_cached_for_the_same_question_and_bases(engine):
     again = engine.answer("  quais compras de MERENDA escolar existem? ", ["pncp"])
     assert len(calls) == 1 and again["cached"] is True and again["answer"] == first["answer"]
     assert "model_written" not in first
+
+
+def test_follow_up_is_searched_as_the_rewritten_question(engine):
+    seen = {}
+    class Model:
+        def ready(self): return True
+        def chat_json(self, system, user):
+            seen["route_prompt"] = user
+            return {"scope": "in", "kind": "records", "standalone": "Quais compras de merenda escolar existem na rede municipal?", "bases": ["pncp"]}
+        def complete(self, q, ctx):
+            seen["q"] = q
+            return "A Prefeitura de Exemplo/GO compra merenda escolar para a rede municipal [C1]."
+    engine.model = Model()
+    out = engine.answer("E na rede municipal?", ["pncp"], history=["Quais compras de merenda escolar existem?"])
+    assert "Quais compras de merenda escolar existem?" in seen["route_prompt"]
+    assert seen["q"].startswith("Quais compras de merenda escolar existem na rede municipal?")
+    assert out["status"] == "answered" and "cached" not in out
+
+
+def test_router_drops_bases_the_question_does_not_need(engine):
+    sql = _FakeSql([["São Paulo", 1234]])
+    siope = _FakeSql([["x", 1]])
+    engine.corpora["contratos"] = Corpus("contratos", "PNCP contracts", sql, "owner/pncp-analytics", "v1", None)
+    engine.corpora["siope"] = Corpus("siope", "SIOPE", siope, "owner/siope-analytics", "v1", None)
+    q = "Qual município assinou mais contratos em 2025?"
+    engine.model = _RoutingModel({q: {"scope": "in", "kind": "aggregate", "standalone": q, "bases": ["contratos"]}})
+    engine.answer(q, ["pncp", "contratos", "siope"])
+    assert sql.asked == 1 and siope.asked == 0
+
+
+def test_mixed_question_runs_retrieval_and_sql(engine):
+    sql = _FakeSql([["GO", 16229.36]])
+    engine.corpora["siope"] = Corpus("siope", "SIOPE", sql, "owner/siope-analytics", "v1", None)
+    q = "Quais compras de merenda escolar existem?"
+    engine.model = _RoutingModel({q: {"scope": "in", "kind": "mixed", "standalone": q, "bases": ["pncp", "siope"]}})
+    out = engine.answer(q, ["pncp", "siope"])
+    ids = [c["chunk_id"] for c in out["citations"]]
+    assert sql.asked == 1 and any(i.endswith(":sql") for i in ids) and any(not i.endswith(":sql") for i in ids)

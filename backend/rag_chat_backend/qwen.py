@@ -72,7 +72,8 @@ class QwenClient:
         body = {"model": self.model, "temperature": 0.2, "max_tokens": 500, "chat_template_kwargs": {"enable_thinking": False},
                 "messages": [{"role": "system", "content": (
                     "Summarize the research conversation below as a short bullet list in " + language + ". Use only what the "
-                    "earlier answers say, keep every number exactly as written, and do not add facts.")},
+                    "earlier answers say, keep every number exactly as written, do not add facts, and leave out citation tags such as "
+                    "[C1], which only make sense inside the original answers.")},
                              {"role": "user", "content": "\n\n".join(turns)}]}
         req = urllib.request.Request(f"{self.base_url}/chat/completions", data=json.dumps(body).encode(), headers=self._headers(json_body=True))
         try:

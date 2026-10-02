@@ -31,22 +31,20 @@ PNCP_SQL = (
 )
 
 SIOPE_EXTRA = (
-    " For per-student questions use bi.siope_por_aluno, which already has nome_municipio. To list or look up indicators use "
-    "siope.dim_indicador (codigo_indicador, nome_indicador), never a DISTINCT over the large indicator table. Expense values "
-    "in obt_fnde_siope_despesa_funcao_municipio_ano and obt_fnde_siope_dados_gerais_municipio_ano accumulate over the year "
-    "by num_periodo: use only the highest num_periodo per municipality and year, never a sum across periods."
-    " Years available: 2021 to 2025 only (2025 partial); when a question asks for earlier years, answer with the years that "
-    "exist. Always return municipality names (nome_municipio from obt_ibge_municipio or from the siope tables), never only "
-    "codes. Match names without accents and in upper case on both sides: public.f_unaccent(upper(nome_municipio)) = "
-    "public.f_unaccent(upper('Goiânia')). Per-student values above 100000 BRL are data-entry errors: exclude valor > 100000 from rankings and say so. "
-    "Indicator codes in obt_fnde_siope_indicador_municipio_ano (codigo_indicador is text): '24' share of tax revenue applied "
-    "in MDE, legal minimum 25 percent; '35' education spending as a share of all spending; '57' investment per student; "
-    "'44' per student in early childhood education, '45' in primary education, '46' in secondary education; '28' share of "
-    "FUNDEB spent on early childhood education; '36' school meals as a share of education spending; '67' share of FUNDEB "
-    "paid to education professionals, legal minimum 70 percent. Filter esfera = 'Municipal' and keep the highest num_periodo "
-    "per municipality and year. Subfunction values in obt_fnde_siope_despesa_funcao_municipio_ano start with a code, such "
-    "as '365 - Educação Infantil (Creche)', '361 - Ensino Fundamental', '306 - Alimentação e Nutrição', '782 - Transporte "
-    "Escolar'; match them with subfuncao LIKE '365%'."
+    " Start with these small tables, which already keep only the latest reporting period: bi.siope_por_aluno (investment per "
+    "student with nome_municipio, primary key codigo_municipio, ano), siope.indicador_municipio_ano (every indicator, one row "
+    "per municipality, year and codigo_indicador), siope.despesa_subfuncao_municipio_ano (spending by subfunction, one row per "
+    "municipality, year and subfuncao) and siope.dim_indicador (the list of indicators). Use the larger obt_ tables only "
+    "for columns these do not have. Years available: 2021 to 2025 only (2025 partial); when a question asks for earlier "
+    "years, answer with the years that exist. Always return municipality names, never only codes. Match names without "
+    "accents and in upper case on both sides: public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Goiânia')). "
+    "Per-student values above 100000 BRL are data-entry errors: exclude valor > 100000 from rankings and say so. "
+    "Indicator codes (codigo_indicador is text): '24' share of tax revenue applied in MDE, legal minimum 25 percent; '35' "
+    "education spending as a share of all spending; '57' investment per student; '44' per student in early childhood "
+    "education, '45' in primary education, '46' in secondary education; '28' share of FUNDEB spent on early childhood "
+    "education; '36' school meals as a share of education spending; '67' share of FUNDEB paid to education professionals, "
+    "legal minimum 70 percent. Subfunction values start with a code, such as '365 - Educação Infantil (Creche)', '361 - "
+    "Ensino Fundamental', '306 - Alimentação e Nutrição', '782 - Transporte Escolar'; match them with subfuncao LIKE '365%'."
 )
 
 
@@ -59,11 +57,12 @@ def main(path: str) -> None:
                 if base["id"] == "pncp-sql":
                     base["notes"] = PNCP_SQL
                 elif base["id"] == "siope":
-                    for table in ("bi.siope_por_aluno", "siope.dim_indicador"):
+                    for table in ("siope.despesa_subfuncao_municipio_ano", "siope.indicador_municipio_ano",
+                                  "siope.dim_indicador", "bi.siope_por_aluno"):
                         if table not in base["tables"]:
                             base["tables"].insert(0, table)
-                    # Keep the original notes, replace any earlier version of the extra block.
-                    base["notes"] = base.get("notes", "").split(" Years available:")[0] + SIOPE_EXTRA
+                    # The notes are written here in full, so the base never carries an older, conflicting version.
+                    base["notes"] = SIOPE_EXTRA.strip()
             lines[i] = "RAG_EXTRA_CORPORA=" + json.dumps(corpora, ensure_ascii=False)
     open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
     print("notes set")

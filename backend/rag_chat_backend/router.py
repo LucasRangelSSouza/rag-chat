@@ -27,11 +27,13 @@ ROUTE_SYSTEM = (
     "kind: \"aggregate\" when the answer is a number or a ranking computed over many records (how many, total, sum, average, "
     "median, which has the most or least, top N, share, comparison of totals), \"records\" when the answer is specific "
     "records or their content, \"mixed\" when the question asks for both. "
+    "numeric_part: when kind is \"mixed\", the part of the standalone question that asks for the number, written as a "
+    "complete question; otherwise an empty string. "
     "bases: the ids of the selected bases needed to answer; notice search answers records about published notices, the "
     "contracts base answers counts and values of contracts and price registrations, the education base answers education "
     "spending by municipality. "
     "Answer with JSON only: {\"scope\": \"in\"|\"out\", \"standalone\": \"...\", \"kind\": \"aggregate\"|\"records\"|\"mixed\", "
-    "\"bases\": [\"id\", ...]}."
+    "\"numeric_part\": \"...\", \"bases\": [\"id\", ...]}."
 )
 
 _AGGREGATE = re.compile(
@@ -49,6 +51,7 @@ class Route:
     mixed: bool = False
     standalone: str = ""
     bases: tuple[str, ...] = field(default_factory=tuple)
+    numeric_part: str = ""
 
 
 def _fold(text: str) -> str:
@@ -77,5 +80,7 @@ def route(question: str, model, bases: list[tuple[str, str]] | list[str], histor
         return keyword_route(question, ids)
     standalone = reply.get("standalone") if isinstance(reply.get("standalone"), str) and reply["standalone"].strip() else question
     chosen = tuple(b for b in (reply.get("bases") or []) if b in ids) or tuple(ids)
+    numeric = reply.get("numeric_part") if isinstance(reply.get("numeric_part"), str) else ""
     return Route(in_scope=reply["scope"] == "in", aggregate=reply["kind"] in {"aggregate", "mixed"}, by_model=True,
-                 mixed=reply["kind"] == "mixed", standalone=standalone.strip()[:1000], bases=chosen)
+                 mixed=reply["kind"] == "mixed", standalone=standalone.strip()[:1000], bases=chosen,
+                 numeric_part=numeric.strip()[:1000])

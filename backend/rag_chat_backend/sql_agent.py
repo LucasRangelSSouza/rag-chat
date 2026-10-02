@@ -61,7 +61,9 @@ SYSTEM = ("You write one PostgreSQL SELECT statement that answers the user's que
           "aggregate and ORDER BY when the question asks for a ranking or total, and add LIMIT 50 at most. "
           "Use the statistic the question names: PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY col) for a median, AVG only for an average. "
           "Answer with JSON only: {\"sql\": \"...\", \"explanation\": \"one sentence about what the query measures\"}. "
-          "If the tables cannot answer the question, answer {\"sql\": null, \"explanation\": \"why\"}.")
+          "A question can have several parts and other sources answer the rest: write the query for the part these tables "
+          "can answer and ignore the other parts. Only when no part can be answered from these tables, answer "
+          "{\"sql\": null, \"explanation\": \"why\"}.")
 
 
 class SqlStore:

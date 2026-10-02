@@ -134,7 +134,7 @@ class Engine:
         if plan.mixed:
             # A question that asks for records and for a number gets both.
             total += self._retrieve(query, text_bases, msg, tagged, citations)
-            self._query(query, sql_bases, tagged, citations)
+            self._query(plan.numeric_part or query, sql_bases, tagged, citations)
         else:
             # Aggregates go to SQL first; records go to retrieval first. The other side runs only if the first found nothing.
             order = ("sql", "text") if plan.aggregate and sql_bases else ("text", "sql")

@@ -58,7 +58,7 @@ class QwenClient:
         """One deterministic call that must return a JSON object (used by the SQL agent)."""
         from .sql_agent import parse_json_reply
 
-        body = {"model": self.model, "temperature": 0, "max_tokens": 700, "chat_template_kwargs": {"enable_thinking": False},
+        body = {"model": self.model, "temperature": 0, "max_tokens": 1500, "chat_template_kwargs": {"enable_thinking": False},
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
         req = urllib.request.Request(f"{self.base_url}/chat/completions", data=json.dumps(body).encode(), headers=self._headers(json_body=True))
         try:

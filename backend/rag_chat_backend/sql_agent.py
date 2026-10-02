@@ -64,6 +64,8 @@ SYSTEM = ("You write one PostgreSQL SELECT statement that answers the user's que
           "them in one result: one row per ranked item with the overall totals repeated as extra columns (window functions "
           "such as SUM(...) OVER () or a CTE). "
           "Use the statistic the question names: PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY col) for a median, AVG only for an average. "
+          "PostgreSQL does not allow PERCENTILE_CONT with OVER (): compute a median in its own CTE and join it back. "
+          "Keep queries short: use at most four LIKE patterns for a topic, chosen from its most common words. "
           "Answer with JSON only: {\"sql\": \"...\", \"explanation\": \"one sentence about what the query measures\"}. "
           "A question can have several parts and other sources answer the rest: write the query for the part these tables "
           "can answer and ignore the other parts. Only when no part can be answered from these tables, answer "

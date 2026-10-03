@@ -63,7 +63,8 @@ def run(vectors_path: str, out_path: str) -> None:
     out = {"queries": len(vecs), "configs": []}
     with connect() as conn, conn.cursor() as cur:
         cur.execute("SET statement_timeout = 0")
-        cur.execute("SET max_parallel_maintenance_workers = 1")
+        # One process and a modest work memory: a container's /dev/shm is small, and parallel builds allocate shared memory there.
+        cur.execute("SET max_parallel_maintenance_workers = 0")
         cur.execute("SELECT count(*) FROM bench.vec")
         out["rows"] = cur.fetchone()[0]
 
@@ -83,9 +84,15 @@ def run(vectors_path: str, out_path: str) -> None:
             ("hnsw", "m = 16, ef_construction = 64", "CREATE INDEX vec_idx ON bench.vec USING hnsw (embedding halfvec_cosine_ops) WITH (m = 16, ef_construction = 64)",
              [f"SET hnsw.ef_search = {e}" for e in (10, 20, 40, 80, 160, 320)]),
         ]
+        only = os.environ.get("ONLY")
+        if os.path.exists(out_path):
+            previous = json.load(open(out_path, encoding="utf-8"))
+            out["configs"] = [c for c in previous.get("configs", []) if only and c["index"] != only]
         for kind, params, ddl, settings in builds:
+            if only and kind != only:
+                continue
             cur.execute("DROP INDEX IF EXISTS bench.vec_idx")
-            cur.execute("SET maintenance_work_mem = '1GB'")
+            cur.execute(f"SET maintenance_work_mem = '{os.environ.get('BUILD_MEM', '512MB')}'")
             start = time.perf_counter()
             cur.execute(ddl)
             build_s = time.perf_counter() - start

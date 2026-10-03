@@ -1,0 +1,3079 @@
+[
+ {
+  "id": "s01",
+  "status": "answered",
+  "answer": "O investimento por aluno de Goiânia, GO, em 2023 foi de R$ 16.229,36 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT valor FROM bi.siope_por_aluno WHERE ano = 2023 AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Goiânia')) AND sigla_uf = 'GO'",
+     "columns": [
+      "valor"
+     ],
+     "rows": [
+      [
+       16229.36
+      ]
+     ],
+     "explanation": "Retrieves the per-student education investment value for Goiânia, GO in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.3
+ },
+ {
+  "id": "s02",
+  "status": "answered",
+  "answer": "Em 2024, 5.565 municípios declararam ao SIOPE [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(DISTINCT codigo_municipio) AS municipios_declarados FROM siope.indicador_municipio_ano WHERE ano = 2024",
+     "columns": [
+      "municipios_declarados"
+     ],
+     "rows": [
+      [
+       5565
+      ]
+     ],
+     "explanation": "Counts the distinct municipalities that reported at least one SIOPE indicator in 2024."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 0.8
+ },
+ {
+  "id": "s03",
+  "status": "answered",
+  "answer": "A mediana do investimento por aluno entre os municípios de Minas Gerais em 2023 foi de R$ 18.720,56 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY valor) AS mediana_investimento_por_aluno FROM bi.siope_por_aluno WHERE sigla_uf = 'MG' AND ano = 2023 AND valor <= 100000",
+     "columns": [
+      "mediana_investimento_por_aluno"
+     ],
+     "rows": [
+      [
+       18720.56
+      ]
+     ],
+     "explanation": "Calculates the median per-student education investment for municipalities in Minas Gerais in 2023, excluding data-entry errors above 100,000 BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 8.8
+ },
+ {
+  "id": "s04",
+  "status": "answered",
+  "answer": "A capital com o maior investimento por aluno em educação em 2023 foi Vitória, no estado do Espírito Santo [C1]. O valor registrado para esse município foi de R$ 35.086,07 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT nome_municipio, sigla_uf, valor FROM bi.siope_por_aluno WHERE ano = 2023 AND valor <= 100000 AND ( (nome_municipio = 'Rio Branco' AND sigla_uf = 'AC') OR (nome_municipio = 'Maceió' AND sigla_uf = 'AL') OR (nome_municipio = 'Macapá' AND sigla_uf = 'AP') OR (nome_municipio = 'Manaus' AND sigla_uf = 'AM') OR (nome_municipio = 'Salvador' AND sigla_uf = 'BA') OR (nome_municipio = 'Fortaleza' AND sigla_uf = 'CE') OR (nome_municipio = 'Brasília' AND sigla_uf = 'DF') OR (nome_municipio = 'Vitória' AND sigla_uf = 'ES') OR (nome_municipio = 'Goiânia' AND sigla_uf = 'GO') OR (nome_municipio = 'São Luís' AND sigla_uf = 'MA') OR (nome_municipio = 'Cuiabá' AND sigla_uf = 'MT') OR (nome_municipio = 'Campo Grande' AND sigla_uf = 'MS') OR (nome_municipio = 'Belo Horizonte' AND sigla_uf = 'MG') OR (nome_municipio = 'Belém' AND sigla_uf = 'PA') OR (nome_municipio = 'João Pessoa' AND sigla_uf = 'PB') OR (nome_municipio = 'Curitiba' AND sigla_uf = 'PR') OR (nome_municipio = 'Recife' AND sigla_uf = 'PE') OR (nome_municipio = 'Teresina' AND sigla_uf = 'PI') OR (nome_municipio = 'Rio de Janeiro' AND sigla_uf = 'RJ') OR (nome_municipio = 'Natal' AND sigla_uf = 'RN') OR (nome_municipio = 'Porto Alegre' AND sigla_uf = 'RS') OR (nome_municipio = 'Porto Velho' AND sigla_uf = 'RO') OR (nome_municipio = 'Boa Vista' AND sigla_uf = 'RR') OR (nome_municipio = 'Florianópolis' AND sigla_uf = 'SC') OR (nome_municipio = 'São Paulo' AND sigla_uf = 'SP') OR (nome_municipio = 'Aracaju' AND sigla_uf = 'SE') OR (nome_municipio = 'Palmas' AND sigla_uf = 'TO') ) ORDER BY valor DESC LIMIT 1",
+     "columns": [
+      "nome_municipio",
+      "sigla_uf",
+      "valor"
+     ],
+     "rows": [
+      [
+       "Vitória",
+       "ES",
+       35086.07
+      ]
+     ],
+     "explanation": "Identifies the state capital with the highest per-student education investment in 2023, excluding data-entry errors."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 22.5
+ },
+ {
+  "id": "s05",
+  "status": "answered",
+  "answer": "A média do investimento por aluno na região Nordeste em 2022 foi de R$ 9.487,32 [C1]. Esse valor foi calculado excluindo registros com valores superiores a R$ 100.000,00, considerados erros de digitação [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT AVG(valor) AS media_investimento_por_aluno FROM bi.siope_por_aluno WHERE ano = 2022 AND nome_regiao = 'Nordeste' AND valor <= 100000",
+     "columns": [
+      "media_investimento_por_aluno"
+     ],
+     "rows": [
+      [
+       9487.317103794636
+      ]
+     ],
+     "explanation": "Calculates the average per-student education investment in the Nordeste region for 2022, excluding data-entry errors above 100,000 BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 13.7
+ },
+ {
+  "id": "s06",
+  "status": "answered",
+  "answer": "Em 2023, 27 municípios aplicaram menos de 25% da receita de impostos em educação, conforme o indicador MDE (código 24) do SIOPE [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS municipios_mde_abaixo_25 FROM siope.indicador_municipio_ano WHERE ano = 2023 AND codigo_indicador = '24' AND valor < 25",
+     "columns": [
+      "municipios_mde_abaixo_25"
+     ],
+     "rows": [
+      [
+       27
+      ]
+     ],
+     "explanation": "Counts municipalities whose MDE indicator (code 24) was below 25% in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.8
+ },
+ {
+  "id": "s07",
+  "status": "answered",
+  "answer": "Em 2023, o município de São Paulo (SP) aplicou 26,63% da sua receita de impostos em Manutenção e Desenvolvimento da Educação (MDE) [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT valor FROM siope.indicador_municipio_ano WHERE codigo_indicador = '24' AND ano = 2023 AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('São Paulo')) AND sigla_uf = 'SP'",
+     "columns": [
+      "valor"
+     ],
+     "rows": [
+      [
+       26.63
+      ]
+     ],
+     "explanation": "Retrieves the percentage of tax revenue applied to MDE (indicator 24) for the municipality of São Paulo in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.9
+ },
+ {
+  "id": "s08",
+  "status": "answered",
+  "answer": "Recife, in the state of Pernambuco, paid R$ 1,090,579,242.20 for primary education (subfunction 361) in 2023 [C1].\n\nCoverage: SIOPE education spending (SQL), release v1, data through 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT valor_paga FROM siope.despesa_subfuncao_municipio_ano WHERE ano = 2023 AND subfuncao LIKE '361%' AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Recife')) AND sigla_uf = 'PE'",
+     "columns": [
+      "valor_paga"
+     ],
+     "rows": [
+      [
+       1090579242.2
+      ]
+     ],
+     "explanation": "Retrieves the paid education spending for primary education (subfunction 361) in Recife, PE for the year 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.3
+ },
+ {
+  "id": "s09",
+  "status": "answered",
+  "answer": "O município de São Patrício, em Goiás, teve o maior investimento por aluno em 2024, com um valor de R$ 39.001,26 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT nome_municipio, sigla_uf, valor FROM bi.siope_por_aluno WHERE ano = 2024 AND sigla_uf = 'GO' AND valor <= 100000 ORDER BY valor DESC LIMIT 1",
+     "columns": [
+      "nome_municipio",
+      "sigla_uf",
+      "valor"
+     ],
+     "rows": [
+      [
+       "São Patrício",
+       "GO",
+       39001.26
+      ]
+     ],
+     "explanation": "Identifies the municipality in Goiás with the highest per-student education investment in 2024, excluding data-entry errors above 100,000 BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.1
+ },
+ {
+  "id": "s10",
+  "status": "answered",
+  "answer": "Em 2023, 15 municípios pagaram menos de 70% do FUNDEB aos profissionais da educação [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS municipios FROM siope.indicador_municipio_ano WHERE ano = 2023 AND codigo_indicador = '67' AND valor < 70",
+     "columns": [
+      "municipios"
+     ],
+     "rows": [
+      [
+       15
+      ]
+     ],
+     "explanation": "Counts municipalities where the share of FUNDEB paid to education professionals (indicator 67) was below 70% in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.1
+ },
+ {
+  "id": "s11",
+  "status": "answered",
+  "answer": "O total pago em alimentação e nutrição (subfunção 306) pelos municípios do Ceará em 2023 foi de R$ 296.778.658,33 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT SUM(valor_paga) AS total_pago_alimentacao_nutricao FROM siope.despesa_subfuncao_municipio_ano WHERE sigla_uf = 'CE' AND ano = 2023 AND subfuncao LIKE '306%'",
+     "columns": [
+      "total_pago_alimentacao_nutricao"
+     ],
+     "rows": [
+      [
+       296778658.3300001
+      ]
+     ],
+     "explanation": "Sums the paid spending on subfunction 306 (Alimentação e Nutrição) for all municipalities in Ceará in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 11.8
+ },
+ {
+  "id": "s12",
+  "status": "answered",
+  "answer": "O investimento por aluno de Curitiba, PR, em 2022 foi de R$ 16.423,22 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT valor FROM bi.siope_por_aluno WHERE ano = 2022 AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Curitiba')) AND sigla_uf = 'PR'",
+     "columns": [
+      "valor"
+     ],
+     "rows": [
+      [
+       16423.22
+      ]
+     ],
+     "explanation": "Retrieves the per-student education investment value for Curitiba, PR in 2022."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.3
+ },
+ {
+  "id": "s13",
+  "status": "answered",
+  "answer": "O estado com a maior mediana de investimento por aluno em 2023 foi São Paulo (SP) [C1]. O valor da mediana de investimento por aluno para esse estado foi de R$ 25.507,92 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT sigla_uf, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY valor) AS mediana_investimento_por_aluno FROM bi.siope_por_aluno WHERE ano = 2023 AND valor <= 100000 GROUP BY sigla_uf ORDER BY mediana_investimento_por_aluno DESC LIMIT 1",
+     "columns": [
+      "sigla_uf",
+      "mediana_investimento_por_aluno"
+     ],
+     "rows": [
+      [
+       "SP",
+       25507.92
+      ]
+     ],
+     "explanation": "Calculates the median per-student education investment for each state in 2023, excluding data-entry errors, and returns the state with the highest median."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.9
+ },
+ {
+  "id": "s14",
+  "status": "answered",
+  "answer": "Em 2023, 497 municípios do Rio Grande do Sul declararam dados ao SIOPE [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(DISTINCT codigo_municipio) AS municipios_declarados FROM siope.indicador_municipio_ano WHERE sigla_uf = 'RS' AND ano = 2023",
+     "columns": [
+      "municipios_declarados"
+     ],
+     "rows": [
+      [
+       497
+      ]
+     ],
+     "explanation": "Counts the distinct municipalities in Rio Grande do Sul that have at least one SIOPE indicator record for 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 14.0
+ },
+ {
+  "id": "s15",
+  "status": "answered",
+  "answer": "Salvador, na Bahia, aplicou 25,83% da receita de impostos em Manutenção e Desenvolvimento da Educação (MDE) em 2023 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT valor FROM siope.indicador_municipio_ano WHERE public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Salvador')) AND sigla_uf = 'BA' AND ano = 2023 AND codigo_indicador = '24'",
+     "columns": [
+      "valor"
+     ],
+     "rows": [
+      [
+       25.83
+      ]
+     ],
+     "explanation": "Retrieves the percentage of tax revenue applied to MDE (indicator 24) for Salvador, BA in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 11.6
+ },
+ {
+  "id": "s16",
+  "status": "answered",
+  "answer": "The average investment per student in Santa Catarina municipalities in 2024 was R$ 18,350.22 [C1]. This figure is derived from SIOPE data for the year 2024, excluding entries above 100,000 BRL to mitigate data-entry errors [C1].\n\nCoverage: SIOPE education spending (SQL), release v1, data through 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT AVG(valor) AS average_investment_per_student FROM bi.siope_por_aluno WHERE sigla_uf = 'SC' AND ano = 2024 AND valor <= 100000",
+     "columns": [
+      "average_investment_per_student"
+     ],
+     "rows": [
+      [
+       18350.21566101695
+      ]
+     ],
+     "explanation": "Calculates the average education investment per student for municipalities in Santa Catarina in 2024, excluding data-entry errors above 100,000 BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.1
+ },
+ {
+  "id": "s17",
+  "status": "answered",
+  "answer": "Manaus, no Amazonas, pagou R$ 1.499.910.667,80 em despesas com ensino fundamental (subfunção 361) no ano de 2023 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT valor_paga FROM siope.despesa_subfuncao_municipio_ano WHERE public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Manaus')) AND sigla_uf = 'AM' AND ano = 2023 AND subfuncao LIKE '361%'",
+     "columns": [
+      "valor_paga"
+     ],
+     "rows": [
+      [
+       1499910667.8
+      ]
+     ],
+     "explanation": "Retrieves the paid education spending for primary education (subfunction 361) in Manaus, AM in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 13.9
+ },
+ {
+  "id": "s18",
+  "status": "answered",
+  "answer": "O investimento por aluno de Belo Horizonte, MG, em 2024 foi de R$ 19.328,68 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT nome_municipio, valor FROM bi.siope_por_aluno WHERE ano = 2024 AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Belo Horizonte')) AND sigla_uf = 'MG'",
+     "columns": [
+      "nome_municipio",
+      "valor"
+     ],
+     "rows": [
+      [
+       "Belo Horizonte",
+       19328.68
+      ]
+     ],
+     "explanation": "Retrieves the 2024 per-student education investment for Belo Horizonte, MG from the latest reporting period."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.9
+ },
+ {
+  "id": "s19",
+  "status": "answered",
+  "answer": "O município do Pará com o menor investimento por aluno em 2023 foi Brasil Novo [C1]. O valor registrado para essa localidade foi de R$ 6.893,20 [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT nome_municipio, sigla_uf, valor FROM bi.siope_por_aluno WHERE ano = 2023 AND sigla_uf = 'PA' AND valor <= 100000 ORDER BY valor ASC LIMIT 1",
+     "columns": [
+      "nome_municipio",
+      "sigla_uf",
+      "valor"
+     ],
+     "rows": [
+      [
+       "Brasil Novo",
+       "PA",
+       6893.2
+      ]
+     ],
+     "explanation": "Identifies the municipality in Pará with the lowest per-student education investment in 2023, excluding data-entry errors above 100,000 BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 12.8
+ },
+ {
+  "id": "s20",
+  "status": "answered",
+  "answer": "Em 2023, 1.838 municípios brasileiros tiveram investimento por aluno acima de R$ 20.000,00, excluindo-se valores superiores a R$ 100.000,00 para evitar erros de digitação [C1].\n\nCobertura: SIOPE education spending (SQL), versão v1, dados até 2025.",
+  "citations": [
+   {
+    "title": "SQL over SIOPE education spending (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/siope-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "siope",
+    "dataset": {
+     "slug": "lucasrangelss/siope-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "siope"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS municipios_acima_20k FROM bi.siope_por_aluno WHERE ano = 2023 AND valor > 20000 AND valor <= 100000",
+     "columns": [
+      "municipios_acima_20k"
+     ],
+     "rows": [
+      [
+       1838
+      ]
+     ],
+     "explanation": "Counts the number of municipalities with per-student education investment above 20,000 BRL in 2023, excluding data-entry errors above 100,000 BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 13.8
+ },
+ {
+  "id": "c01",
+  "status": "answered",
+  "answer": "Em 2024, foram assinados 62.774 contratos no estado de Goiás [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf = 'GO'",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       62774
+      ]
+     ],
+     "explanation": "Counts the number of contracts signed in the state of Goiás in 2024."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.8
+ },
+ {
+  "id": "c02",
+  "status": "answered",
+  "answer": "O valor total dos contratos de Goiânia (GO) em 2024, excluindo valores acima de 1 bilhão, é de R$ 2.728.156.317,90 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT SUM(valor_global) AS valor_total FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Goiânia')) AND sigla_uf = 'GO' AND valor_global < 1e9",
+     "columns": [
+      "valor_total"
+     ],
+     "rows": [
+      [
+       2728156317.900001
+      ]
+     ],
+     "explanation": "Soma o valor global dos contratos de Goiânia em 2024, excluindo valores acima de 1 bilhão BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.3
+ },
+ {
+  "id": "c03",
+  "status": "answered",
+  "answer": "O estado com o maior número de contratos em 2023 foi Santa Catarina (SC), com um total de 74.509 contratos [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT sigla_uf, COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2023 GROUP BY sigla_uf ORDER BY total_contratos DESC LIMIT 50",
+     "columns": [
+      "sigla_uf",
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       "SC",
+       74509
+      ],
+      [
+       "GO",
+       17844
+      ],
+      [
+       "SP",
+       14814
+      ],
+      [
+       "RS",
+       14062
+      ],
+      [
+       "RJ",
+       12971
+      ],
+      [
+       "MG",
+       12764
+      ],
+      [
+       "DF",
+       11296
+      ],
+      [
+       "PR",
+       9867
+      ],
+      [
+       "PE",
+       4937
+      ],
+      [
+       "BA",
+       4570
+      ],
+      [
+       "PB",
+       4087
+      ],
+      [
+       "CE",
+       3278
+      ],
+      [
+       "RN",
+       2693
+      ],
+      [
+       "MS",
+       2244
+      ],
+      [
+       "ES",
+       1917
+      ],
+      [
+       "AM",
+       1839
+      ],
+      [
+       "SE",
+       1817
+      ],
+      [
+       "PA",
+       1625
+      ],
+      [
+       "MT",
+       1484
+      ],
+      [
+       "PI",
+       1277
+      ],
+      [
+       "RO",
+       1010
+      ],
+      [
+       "MA",
+       873
+      ],
+      [
+       "AL",
+       680
+      ],
+      [
+       "TO",
+       503
+      ],
+      [
+       "RR",
+       411
+      ]
+     ],
+     "explanation": "Counts the number of contracts per state in 2023 and ranks them by total count."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 8.9
+ },
+ {
+  "id": "c04",
+  "status": "answered",
+  "answer": "Foram assinados 370 contratos de transporte escolar na Bahia em 2024 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos\nFROM pncp.obt_pncp_contratos\nWHERE ano_contrato = 2024\n  AND sigla_uf = 'BA'\n  AND (public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%transporte escolar%'))\n       OR public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%transporte de alunos%'))\n       OR public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%transporte escolar%')))",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       370
+      ]
+     ],
+     "explanation": "Counts school transport contracts signed in Bahia in 2024, excluding contracts above 1 billion BRL (none expected in this count, but noted per rules)."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 14.2
+ },
+ {
+  "id": "c05",
+  "status": "answered",
+  "answer": "Em 2023, existem 20 contratos de ambulância registrados em Minas Gerais [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos_ambulancia_mg_2023 FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2023 AND sigla_uf = 'MG' AND public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%ambulanc%'))",
+     "columns": [
+      "total_contratos_ambulancia_mg_2023"
+     ],
+     "rows": [
+      [
+       20
+      ]
+     ],
+     "explanation": "Counts the number of ambulance contracts in Minas Gerais in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.1
+ },
+ {
+  "id": "c06",
+  "status": "answered",
+  "answer": "O município de São Paulo, no estado de São Paulo, teve o maior valor contratado em 2024, excluindo contratos acima de 1 bilhão de reais, com um total de R$ 17.382.626.339,82 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT nome_municipio, SUM(valor_global) AS total_valor FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf = 'SP' AND valor_global < 1e9 GROUP BY nome_municipio ORDER BY total_valor DESC LIMIT 1",
+     "columns": [
+      "nome_municipio",
+      "total_valor"
+     ],
+     "rows": [
+      [
+       "São Paulo",
+       17382626339.819942
+      ]
+     ],
+     "explanation": "Identifies the municipality in São Paulo state with the highest total contract value in 2024, excluding contracts above 1 billion BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 11.2
+ },
+ {
+  "id": "c07",
+  "status": "answered",
+  "answer": "In 2022, a total of 29,656 contracts were signed in Brazil [C1].\n\nCoverage: PNCP contracts and price registrations (SQL), release v1, data through 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contracts FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2022",
+     "columns": [
+      "total_contracts"
+     ],
+     "rows": [
+      [
+       29656
+      ]
+     ],
+     "explanation": "Counts the number of contracts signed in 2022."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 8.5
+ },
+ {
+  "id": "c08",
+  "status": "answered",
+  "answer": "O Paraná registrou um total de 29.392 contratos municipais (esfera M) em 2024 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND orgao_esfera_id = 'M' AND sigla_uf = 'PR'",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       29392
+      ]
+     ],
+     "explanation": "Counts the number of municipal contracts registered in Paraná in 2024."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.6
+ },
+ {
+  "id": "c09",
+  "status": "answered",
+  "answer": "Foram assinados 152 contratos de merenda escolar no Ceará em 2023 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2023 AND sigla_uf = 'CE' AND (public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%merenda%')) OR public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%alimentacao escolar%')) OR public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%pnae%')))",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       152
+      ]
+     ],
+     "explanation": "Counts school meal contracts signed in Ceará in 2023 using common Portuguese synonyms for school meals."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 11.4
+ },
+ {
+  "id": "c10",
+  "status": "answered",
+  "answer": "Em 2024, existem 323.932 atas de registro de preço não canceladas [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_atas FROM pncp.obt_pncp_atas WHERE ano_ata = 2024 AND cancelado = FALSE",
+     "columns": [
+      "total_atas"
+     ],
+     "rows": [
+      [
+       323932
+      ]
+     ],
+     "explanation": "Counts the number of non-cancelled price registrations (atas) in the year 2024."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 20.4
+ },
+ {
+  "id": "c11",
+  "status": "answered",
+  "answer": "O valor médio dos contratos de combustível no Mato Grosso em 2024, excluindo aqueles acima de 1 bilhão de reais, foi de R$ 1.108.824,07 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT AVG(valor_global) AS valor_medio FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf = 'MT' AND valor_global < 1e9 AND (public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%combust%')))",
+     "columns": [
+      "valor_medio"
+     ],
+     "rows": [
+      [
+       1108824.0726666667
+      ]
+     ],
+     "explanation": "Calculates the average value of fuel contracts in Mato Grosso in 2024, excluding contracts above 1 billion BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.9
+ },
+ {
+  "id": "c12",
+  "status": "answered",
+  "answer": "O Recife, em Pernambuco, assinou 3.199 contratos em 2023 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2023 AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Recife')) AND sigla_uf = 'PE'",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       3199
+      ]
+     ],
+     "explanation": "Counts the number of contracts signed in Recife, PE in 2023."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 8.3
+ },
+ {
+  "id": "c13",
+  "status": "answered",
+  "answer": "O fornecedor com o maior número de contratos em Goiás em 2024 foi a AUTO POSTO SAO JOSE COMBUSTIVEIS EIRELI, com um total de 1.373 contratos [C1]. Essa empresa lidera o ranking de fornecedores do estado para o ano especificado, seguida pela EQUATORIAL GOIAS DISTRIBUIDORA DE ENERGIA S/A, que possui 834 contratos [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT nome_razao_social_fornecedor, COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf = 'GO' GROUP BY nome_razao_social_fornecedor ORDER BY total_contratos DESC LIMIT 50",
+     "columns": [
+      "nome_razao_social_fornecedor",
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       "AUTO POSTO SAO JOSE COMBUSTIVEIS EIRELI",
+       1373
+      ],
+      [
+       "EQUATORIAL GOIAS DISTRIBUIDORA DE ENERGIA S/A",
+       834
+      ],
+      [
+       "VALTOLINO DIAS DA COSTA EIRELI - ME",
+       476
+      ],
+      [
+       "A.R.M COMERCIO DISTRIBUIÇÃO E SERVIÇOS LTDA",
+       460
+      ],
+      [
+       "IRMÃOS VIEIRA SANTOS LTDA",
+       361
+      ],
+      [
+       "SANEAMENTO DE GOIAS S/A",
+       355
+      ],
+      [
+       "AUTO PEÇAS MAMBAI LTDA ME",
+       350
+      ],
+      [
+       "MILTON MARTINS RODRIGUES & CIA LTDA",
+       312
+      ],
+      [
+       "VB SEIS COMERCIO DE PRODUTOS ALIMENTÍCIOS LTDA",
+       307
+      ],
+      [
+       "PRIME DISTRIBUICAO LTDA",
+       304
+      ],
+      [
+       "AUTO POSTO CORRENTE LTDA",
+       295
+      ],
+      [
+       "S. REGINA MARTINS DOS SANTOS",
+       282
+      ],
+      [
+       "VDL DISTRIBUICAO E SERVICOS LTDA",
+       265
+      ],
+      [
+       "POSTO GLORIA EIRELI",
+       252
+      ],
+      [
+       "M M B PRADO & CIA LTDA",
+       234
+      ],
+      [
+       "OI S.A",
+       227
+      ],
+      [
+       "BELLA DISTRIBUIDORA E SUPRIMENTOS CORPORATIVOS EIRELI",
+       226
+      ],
+      [
+       "CAIXA ECONOMICA FEDERAL",
+       223
+      ],
+      [
+       "FAGNER VIEIRA DA SILVA",
+       215
+      ],
+      [
+       "SUPERMERCADO CRISTAL SIMOLANDIA LTDA",
+       207
+      ],
+      [
+       "RODRIGO SILVEIRA PEIXOTO - GOIANO",
+       206
+      ],
+      [
+       "BANCO DO BRASIL SA",
+       195
+      ],
+      [
+       "CARLOS PIRES FERREIRA",
+       195
+      ],
+      [
+       "BANCO DO BRASIL S/A",
+       193
+      ],
+      [
+       "WL SUPERMERCADO DISTRIBUIDORA E CONVENIENCIA LTDA",
+       183
+      ]
+     ],
+     "explanation": "Counts the number of contracts per supplier in the state of Goiás in 2024, ranking them by frequency."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 13.6
+ },
+ {
+  "id": "c14",
+  "status": "answered",
+  "answer": "Foram assinados 10.477 contratos federais (esfera F) no Distrito Federal em 2024 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE orgao_esfera_id = 'F' AND sigla_uf = 'DF' AND ano_contrato = 2024",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       10477
+      ]
+     ],
+     "explanation": "Counts federal contracts signed in the Federal District in 2024."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.3
+ },
+ {
+  "id": "c15",
+  "status": "answered",
+  "answer": "Foram assinados 2.448 contratos de uniforme escolar no Brasil em 2024 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%uniforme%'))",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       2448
+      ]
+     ],
+     "explanation": "Counts the number of school uniform contracts signed in 2024."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 21.9
+ },
+ {
+  "id": "c16",
+  "status": "answered",
+  "answer": "The total contract value in Porto Alegre in 2023, excluding values above 1 billion BRL, was R$ 418,403,760.60 [C1].\n\nCoverage: PNCP contracts and price registrations (SQL), release v1, data through 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT SUM(valor_global) AS total_valor FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2023 AND public.f_unaccent(upper(nome_municipio)) = public.f_unaccent(upper('Porto Alegre')) AND sigla_uf = 'RS' AND valor_global < 1e9",
+     "columns": [
+      "total_valor"
+     ],
+     "rows": [
+      [
+       418403760.5959006
+      ]
+     ],
+     "explanation": "The query sums the global contract values for Porto Alegre in 2023, excluding contracts above 1 billion BRL."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 12.3
+ },
+ {
+  "id": "c17",
+  "status": "answered",
+  "answer": "O estado do Piauí registrou 366 contratos relacionados a medicamentos em 2024 [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf = 'PI' AND public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%medicamento%'))",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       366
+      ]
+     ],
+     "explanation": "Counts the number of medicine-related contracts registered in the state of Piauí in 2024."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.4
+ },
+ {
+  "id": "c18",
+  "status": "answered",
+  "answer": "O estado da região Norte que teve mais contratos em 2024 foi o Pará (PA), com um total de 8.112 contratos registrados no PNCP [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT sigla_uf, COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf IN ('AC','AM','AP','PA','RO','RR','TO') GROUP BY sigla_uf ORDER BY total_contratos DESC LIMIT 1",
+     "columns": [
+      "sigla_uf",
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       "PA",
+       8112
+      ]
+     ],
+     "explanation": "Counts the number of contracts in 2024 for each state in the North region and returns the state with the highest count."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.4
+ },
+ {
+  "id": "c19",
+  "status": "answered",
+  "answer": "Em 2024, o poder legislativo de Minas Gerais assinou 3.697 contratos [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf = 'MG' AND orgao_poder_id = 'L'",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       3697
+      ]
+     ],
+     "explanation": "Counts the number of contracts signed in 2024 in Minas Gerais by the legislative branch."
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 9.9
+ },
+ {
+  "id": "c20",
+  "status": "answered",
+  "answer": "Em 2024, foram assinados 334 contratos de software em Santa Catarina, conforme os dados do PNCP [C1].\n\nCobertura: PNCP contracts and price registrations (SQL), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SQL over PNCP contracts and price registrations (SQL)",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:sql",
+    "document_id": "pncp-sql",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "pncp-sql"
+    ],
+    "query": {
+     "sql": "SELECT COUNT(*) AS total_contratos FROM pncp.obt_pncp_contratos WHERE ano_contrato = 2024 AND sigla_uf = 'SC' AND (public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%software%')) OR public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%sistema de gestao%')))",
+     "columns": [
+      "total_contratos"
+     ],
+     "rows": [
+      [
+       334
+      ]
+     ],
+     "explanation": "Counts software contracts signed in Santa Catarina in 2024, excluding contracts above 1 billion BRL is not applicable for a simple count but the filter is applied to ensure data quality if it were a sum, however for a count the exclusion is not strictly necessary unless specified, but the prompt say"
+    }
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 20.1
+ },
+ {
+  "id": "r01",
+  "status": "answered",
+  "answer": "Em Goiás, existem editais de transporte escolar publicados pela Secretaria Municipal de Administração de Goiânia para os anos de 2025 e 2026, visando atender aos estudantes da Secretaria Municipal de Educação [C1][C3]. O Município de Cezarina também possui um edital para contratação de serviços de transporte escolar de alunos da rede municipal e estadual [C2]. Além disso, o Município de Baliza publicou editais para o transporte escolar nos anos de 2023 e 2025, atendendo às necessidades da Secretaria Municipal de Educação local [C4][C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SECRETARIA MUNICIPAL DE ADMINISTRACAO - 17577524000142-1-000031/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:17577524000142-1-000031/2025",
+    "document_id": "17577524000142-1-000031/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "17577524000142-1-000031/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE CEZARINA - 25043530000148-1-000011/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:25043530000148-1-000011/2025",
+    "document_id": "25043530000148-1-000011/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "25043530000148-1-000011/2025"
+    ]
+   },
+   {
+    "title": "SECRETARIA MUNICIPAL DE ADMINISTRACAO - 17577524000142-1-000012/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:17577524000142-1-000012/2026",
+    "document_id": "17577524000142-1-000012/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "17577524000142-1-000012/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BALIZA - 01067131000159-1-000057/2023",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:01067131000159-1-000057/2023",
+    "document_id": "01067131000159-1-000057/2023",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01067131000159-1-000057/2023"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BALIZA - 01067131000159-1-000463/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:01067131000159-1-000463/2025",
+    "document_id": "01067131000159-1-000463/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01067131000159-1-000463/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 15.0
+ },
+ {
+  "id": "r02",
+  "status": "answered",
+  "answer": "O Município de Piau/MG publicou edital para aquisição de ambulância conforme a Resolução SES nº 9.332/2024 [C1]. O Município de Rosário da Limeira/MG busca contratar o fornecimento de uma ambulância tipo A, nos termos da Resolução nº 11.032 [C2]. O Município de Japonvar/MG visa a aquisição de um veículo ambulância tipo A, simples remoção, do tipo furgoneta, ano fabricação 2025 [C3]. O Fundo Municipal de Saúde de Sacramento/MG pretende adquirir uma ambulância tipo A, simples remoção, pick-up 4x4, atendendo à Portaria GM/MS nº 2.709/2023 [C4]. O Município de Aguanil/MG busca a aquisição de uma ambulância tipo A, simples remoção, tipo furgão, nova, conforme convênio com a SES/MG [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE PIAU - 18338236000106-1-000001/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:18338236000106-1-000001/2024",
+    "document_id": "18338236000106-1-000001/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "18338236000106-1-000001/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE ROSARIO DA LIMEIRA - 01616837000122-1-000044/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:01616837000122-1-000044/2026",
+    "document_id": "01616837000122-1-000044/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01616837000122-1-000044/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE JAPONVAR - 01612476000146-1-000007/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:01612476000146-1-000007/2025",
+    "document_id": "01612476000146-1-000007/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01612476000146-1-000007/2025"
+    ]
+   },
+   {
+    "title": "FUNDO MUNICIPAL DE SAUDE DE SACRAMENTO - 10547985000123-1-000012/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:10547985000123-1-000012/2024",
+    "document_id": "10547985000123-1-000012/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "10547985000123-1-000012/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE AGUANIL - 17888108000165-1-000053/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:17888108000165-1-000053/2026",
+    "document_id": "17888108000165-1-000053/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "17888108000165-1-000053/2026"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 15.0
+ },
+ {
+  "id": "r03",
+  "status": "answered",
+  "answer": "All five notices in the context are about school uniforms. [C1] is from the Municipality of Cachoeirinha (RS) for the acquisition of school uniform kits. [C2] is from the Municipality of Luzerna (SC) for the supply of uniforms with samples for students. [C3] and [C5] are from the Municipality of Passo Fundo (RS) for the manufacture and supply of school uniforms for the 2026 and 2025 collections, respectively. [C4] is from the Municipality of Ubiratã (PR) for the acquisition of school uniforms for the municipal education network.\n\nCoverage: PNCP procurement notices (text + vector search), release v1, data through 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE CACHOEIRINHA - 87990800000185-1-000430/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:87990800000185-1-000430/2025",
+    "document_id": "87990800000185-1-000430/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "87990800000185-1-000430/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE LUZERNA - 01613428000172-1-000021/2023",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:01613428000172-1-000021/2023",
+    "document_id": "01613428000172-1-000021/2023",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01613428000172-1-000021/2023"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE PASSO FUNDO - 87612537000190-1-000216/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:87612537000190-1-000216/2025",
+    "document_id": "87612537000190-1-000216/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "87612537000190-1-000216/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE UBIRATA - 76950096000110-1-000229/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:76950096000110-1-000229/2024",
+    "document_id": "76950096000110-1-000229/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "76950096000110-1-000229/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE PASSO FUNDO - 87612537000190-1-000216/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:87612537000190-1-000216/2024",
+    "document_id": "87612537000190-1-000216/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "87612537000190-1-000216/2024"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 0.8
+ },
+ {
+  "id": "r04",
+  "status": "answered",
+  "answer": "No Ceará, o Município de Altaneira publicou o edital [C1] para aquisição de gêneros alimentícios destinados à merenda escolar da rede pública municipal. O Município de Barro também emitiu um pregão eletrônico para a mesma finalidade, atendendo aos programas de distribuição de merenda escolar [C3]. Na cidade de Cedro, foram registrados dois editais distintos para a aquisição de alimentos para a preparação da merenda escolar, visando atender às necessidades da Secretaria de Educação e das unidades escolares [C4][C5]. O registro de Viçosa do Ceará refere-se a uma manifestação de interesse para registro de preços e não especifica a aquisição direta de gêneros alimentícios para merenda escolar [C2].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE ALTANEIRA - 07385503000171-1-000006/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:07385503000171-1-000006/2025",
+    "document_id": "07385503000171-1-000006/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "07385503000171-1-000006/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE VICOSA DO CEARA - 10462497000113-1-000015/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:10462497000113-1-000015/2025",
+    "document_id": "10462497000113-1-000015/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "10462497000113-1-000015/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BARRO - 07620396000119-1-000007/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:07620396000119-1-000007/2024",
+    "document_id": "07620396000119-1-000007/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "07620396000119-1-000007/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE CEDRO - 07812241000184-1-000001/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:07812241000184-1-000001/2024",
+    "document_id": "07812241000184-1-000001/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "07812241000184-1-000001/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE CEDRO - 07812241000184-1-000033/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:07812241000184-1-000033/2024",
+    "document_id": "07812241000184-1-000033/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "07812241000184-1-000033/2024"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 14.2
+ },
+ {
+  "id": "r05",
+  "status": "answered",
+  "answer": "A Bahia possui cinco licitações ativas para a construção de creches em diferentes municípios. Em Santo Estêvão/BA, o Município de Santo Estêvão busca contratar a construção de uma creche tipo 1 para 210 crianças na comunidade de Lagoinha [C1]. Em Barreiras/BA, o Município de Barreiras realiza licitação para a construção de uma creche pré-escola tipo B nos bairros Santa Luzia e Cidade Nova [C2].\n\nEm Amélia Rodrigues/BA, o Município de Amélia Rodrigues contrata a construção de uma creche pró-infância tipo I na sede do município [C3]. Em Boquira/BA, o Município de Boquira busca serviços para a construção de uma creche no bairro Alto do Paraíso, conforme convênio com o estado [C4]. Finalmente, em Tanhaçu/BA, o Município de Tanhaçu realiza licitação para a construção de uma creche tipo 1 [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE SANTO ESTEVAO - 14042667000161-1-000049/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:14042667000161-1-000049/2025",
+    "document_id": "14042667000161-1-000049/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "14042667000161-1-000049/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BARREIRAS - 13654405000195-1-000055/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:13654405000195-1-000055/2025",
+    "document_id": "13654405000195-1-000055/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "13654405000195-1-000055/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE AMELIA RODRIGUES - 13607213000128-1-000004/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:13607213000128-1-000004/2025",
+    "document_id": "13607213000128-1-000004/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "13607213000128-1-000004/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BOQUIRA - 13780770000146-1-000025/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:13780770000146-1-000025/2026",
+    "document_id": "13780770000146-1-000025/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "13780770000146-1-000025/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE TANHACU - 13676309000148-1-000023/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:13676309000148-1-000023/2025",
+    "document_id": "13676309000148-1-000023/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "13676309000148-1-000023/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 17.1
+ },
+ {
+  "id": "r06",
+  "status": "answered",
+  "answer": "O Município de Esperança Nova/PR abriu concorrência eletrônica para pavimentação asfáltica em CBUQ nas estradas Mailand, Ventania e Tajuba [C1]. O Município de Planalto/PR publicou edital para execução de obra de pavimentação asfáltica em CBUQ em trecho de rodovia municipal [C2]. O Estado do Paraná, em Almirante Tamandaré/PR, contratou serviços de pavimentação asfáltica na Rua Reinaldo Dumort [C3]. Os Municípios de Astorga/PR realizaram dois editais para pavimentação asfáltica na Marginal da PR-218, conforme convênio com a SEIL [C4][C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE ESPERANCA NOVA - 01612269000191-1-000033/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:01612269000191-1-000033/2024",
+    "document_id": "01612269000191-1-000033/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01612269000191-1-000033/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE PLANALTO - 76460526000116-1-000018/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:76460526000116-1-000018/2026",
+    "document_id": "76460526000116-1-000018/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "76460526000116-1-000018/2026"
+    ]
+   },
+   {
+    "title": "ESTADO DO PARANA - 76416940000128-1-001810/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:76416940000128-1-001810/2024",
+    "document_id": "76416940000128-1-001810/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "76416940000128-1-001810/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE ASTORGA - 75743377000130-1-000283/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:75743377000130-1-000283/2024",
+    "document_id": "75743377000130-1-000283/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "75743377000130-1-000283/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE ASTORGA - 75743377000130-1-000029/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:75743377000130-1-000029/2024",
+    "document_id": "75743377000130-1-000029/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "75743377000130-1-000029/2024"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 16.3
+ },
+ {
+  "id": "r07",
+  "status": "answered",
+  "answer": "The Municipality of Perdizes, MG, issued notices [C1][C3] to acquire notebooks for students in public schools under a state education agreement. The Municipality of Bom Princípio, RS, published a notice [C2] to purchase notebooks for its Education, Culture, and Sports Department. The Municipality of Tatuí, SP, announced a price registration auction [C4] for computers and notebooks for its Education Department and school units. Additionally, the Municipality of Sousa, PB, issued a notice [C5] to buy 66 new notebooks for pedagogical and administrative use in its municipal school network.\n\nCoverage: PNCP procurement notices (text + vector search), release v1, data through 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE PERDIZES - 18140772000194-1-000009/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:18140772000194-1-000009/2026",
+    "document_id": "18140772000194-1-000009/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "18140772000194-1-000009/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BOM PRINCIPIO - 90873787000199-1-003273/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:90873787000199-1-003273/2025",
+    "document_id": "90873787000199-1-003273/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "90873787000199-1-003273/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE PERDIZES - 18140772000194-1-000033/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:18140772000194-1-000033/2026",
+    "document_id": "18140772000194-1-000033/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "18140772000194-1-000033/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE TATUI - 46634564000187-1-000514/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:46634564000187-1-000514/2025",
+    "document_id": "46634564000187-1-000514/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "46634564000187-1-000514/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SOUSA - 08999674000153-1-000083/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:08999674000153-1-000083/2025",
+    "document_id": "08999674000153-1-000083/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "08999674000153-1-000083/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 10.4
+ },
+ {
+  "id": "r08",
+  "status": "answered",
+  "answer": "Os editais de coleta de lixo no estado de São Paulo incluem a aquisição de sacos de lixo pelo Departamento de Água e Esgoto em Bauru/SP [C1] e pelo Município de São Vicente para limpeza urbana e praias [C2]. O Município de Capivari/SP possui editais para contratação de serviços de coleta, transporte e disposição final de resíduos sólidos domiciliares [C3] e para coleta seletiva [C4]. Além disso, o Conselho Regional de Engenharia e Agronomia do Estado de São Paulo (Crea-SP) em São Paulo/SP busca serviços de coleta seletiva e de lixo orgânico para suas sedes [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "DEPARTAMENTO DE AGUA E ESGOTO - 46139952000191-1-000131/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:46139952000191-1-000131/2025",
+    "document_id": "46139952000191-1-000131/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "46139952000191-1-000131/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SAO VICENTE - 46177523000109-1-000567/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:46177523000109-1-000567/2024",
+    "document_id": "46177523000109-1-000567/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "46177523000109-1-000567/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE CAPIVARI - 44723674000190-1-000529/2023",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:44723674000190-1-000529/2023",
+    "document_id": "44723674000190-1-000529/2023",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "44723674000190-1-000529/2023"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE CAPIVARI - 44723674000190-1-000255/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:44723674000190-1-000255/2025",
+    "document_id": "44723674000190-1-000255/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "44723674000190-1-000255/2025"
+    ]
+   },
+   {
+    "title": "CONSELHO REGIONAL DE ENGENHARIA E AGRONOMIA DO ESTADO DE SAO PAULO - 60985017000177-1-000024/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:60985017000177-1-000024/2025",
+    "document_id": "60985017000177-1-000024/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "60985017000177-1-000024/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 14.3
+ },
+ {
+  "id": "r09",
+  "status": "answered",
+  "answer": "No Piauí, o Município de Santana do Piauí realizou pregão eletrônico para a aquisição de medicamentos da farmácia básica destinados a atender as necessidades do município [C1]. O Município de São Luís do Piauí também publicou pregões eletrônicos para a compra de medicamentos da farmácia básica, visando atender a demanda da Secretaria Municipal de Saúde [C2][C3]. Além disso, o Município de União e o Município de São João da Canabrava conduziram processos de pregão eletrônico para a aquisição de medicamentos para a farmácia básica, atendendo às respectivas secretarias municipais de saúde [C4][C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE SANTANA DO PIAUI - 41522137000193-1-000034/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:41522137000193-1-000034/2025",
+    "document_id": "41522137000193-1-000034/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "41522137000193-1-000034/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SAO LUIS DO PIAUI - 01519467000105-1-000018/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:01519467000105-1-000018/2026",
+    "document_id": "01519467000105-1-000018/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01519467000105-1-000018/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SAO LUIS DO PIAUI - 01519467000105-1-000010/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:01519467000105-1-000010/2026",
+    "document_id": "01519467000105-1-000010/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01519467000105-1-000010/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE UNIAO - 06553606000130-1-000114/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:06553606000130-1-000114/2024",
+    "document_id": "06553606000130-1-000114/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "06553606000130-1-000114/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SAO JOAO DA CANABRAVA - 12066973000102-1-000005/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:12066973000102-1-000005/2025",
+    "document_id": "12066973000102-1-000005/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "12066973000102-1-000005/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 12.6
+ },
+ {
+  "id": "r10",
+  "status": "answered",
+  "answer": "Em Santa Catarina, o Município de Luzerna publicou o edital [C1] para o registro de preços destinado à aquisição parcelada de luminárias de LED, visando ampliar a iluminação pública local. O Município de Meleiro emitiu três editais consecutivos para a aquisição de luminárias de LED de diferentes potências (60W, 100W, 50W e 150W), com o objetivo de revitalizar a iluminação pública conforme a Portaria Conjunta SGG/SEF Nº 027/2024 [C2][C3][C4]. Além disso, o Município de Bandeirante lançou uma concorrência presencial para a implantação de iluminação pública em trecho urbano, utilizando recursos de transferências federais [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE LUZERNA - 01613428000172-1-000353/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:01613428000172-1-000353/2024",
+    "document_id": "01613428000172-1-000353/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01613428000172-1-000353/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE MELEIRO - 82837741000196-1-000016/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:82837741000196-1-000016/2024",
+    "document_id": "82837741000196-1-000016/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "82837741000196-1-000016/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE MELEIRO - 82837741000196-1-000033/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:82837741000196-1-000033/2025",
+    "document_id": "82837741000196-1-000033/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "82837741000196-1-000033/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE MELEIRO - 82837741000196-1-000050/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:82837741000196-1-000050/2025",
+    "document_id": "82837741000196-1-000050/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "82837741000196-1-000050/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BANDEIRANTE - 01612528000184-1-000015/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:01612528000184-1-000015/2024",
+    "document_id": "01612528000184-1-000015/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01612528000184-1-000015/2024"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 15.5
+ },
+ {
+  "id": "r11",
+  "status": "answered",
+  "answer": "No Maranhão, o Município de São Mateus do Maranhão abriu licitação para registro de preço visando o fornecimento de material didático para o ensino fundamental I e II [C1]. Em Vargem Grande/MA, o processo eletrônico busca a aquisição de materiais permanentes e mobiliários escolares para a Secretaria Municipal de Educação [C2]. O Fundo Municipal de Educação de Bernardo do Mearim/MA realiza contratação para a aquisição de kits de material escolar para alunos e professores da rede municipal [C3]. Além disso, o Município de Bacuri/MA tem registro de preço para aquisição de material para projetos de leitura e formação cidadã [C4], enquanto Barreirinhas/MA busca material didático para sua rede de ensino [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE SAO MATEUS DO MARANHAO - 06019491000107-1-000069/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:06019491000107-1-000069/2024",
+    "document_id": "06019491000107-1-000069/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "06019491000107-1-000069/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE VARGEM GRANDE - 05648738000183-1-000106/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:05648738000183-1-000106/2025",
+    "document_id": "05648738000183-1-000106/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "05648738000183-1-000106/2025"
+    ]
+   },
+   {
+    "title": "FUNDO MUNICIPAL DE EDUCACAO - 31277010000100-1-000008/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:31277010000100-1-000008/2024",
+    "document_id": "31277010000100-1-000008/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "31277010000100-1-000008/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BACURI - 06151419000120-1-000039/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:06151419000120-1-000039/2025",
+    "document_id": "06151419000120-1-000039/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "06151419000120-1-000039/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE BARREIRINHAS - 06217954000137-1-000051/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:06217954000137-1-000051/2025",
+    "document_id": "06217954000137-1-000051/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "06217954000137-1-000051/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 26.1
+ },
+ {
+  "id": "r12",
+  "status": "answered",
+  "answer": "Os editais para reforma de escolas no Rio Grande do Sul incluem a contratação para reforma e ampliação da Escola Municipal de Ensino Fundamental Emilio Callo em Quaraí/RS [C3]. Há também edital para reforma das calçadas de escolas municipais em Santa Maria/RS visando adequação de acessibilidade [C4]. Outro processo licitatório em Frederico Westphalen/RS refere-se à reforma da antiga Escola Princesa Isabel [C5]. Os registros [C1] e [C2] referem-se a serviços de engenharia sob demanda em Porto Alegre/RS, não especificamente à reforma de escolas.\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SUBSECRETARIA DA ADMINISTRACAO CENTRAL DE LICITACOES - 87958658000199-1-000917/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:87958658000199-1-000917/2024",
+    "document_id": "87958658000199-1-000917/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "87958658000199-1-000917/2024"
+    ]
+   },
+   {
+    "title": "SUBSECRETARIA DA ADMINISTRACAO CENTRAL DE LICITACOES - 87958658000199-1-000908/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:87958658000199-1-000908/2024",
+    "document_id": "87958658000199-1-000908/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "87958658000199-1-000908/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE QUARAI - 88123492000153-1-000199/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:88123492000153-1-000199/2025",
+    "document_id": "88123492000153-1-000199/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "88123492000153-1-000199/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SANTA MARIA - 88488366000100-1-000473/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:88488366000100-1-000473/2024",
+    "document_id": "88488366000100-1-000473/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "88488366000100-1-000473/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE FREDERICO WESTPHALEN - 87612917000125-1-000099/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:87612917000125-1-000099/2026",
+    "document_id": "87612917000125-1-000099/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "87612917000125-1-000099/2026"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 14.7
+ },
+ {
+  "id": "r13",
+  "status": "answered",
+  "answer": "Em Pernambuco, o Município de Tacaimbó/PE abriu credenciamento para artistas e grupos folclóricos para o Carnaval 2025 [C1]. O Município do Cabo de Santo Agostinho/PE também realizou credenciamento para contratação de serviços artísticos visando o \"Carnaval do Cabo\" em 2025 [C2]. Na capital, a Fundação de Cultura Cidade do Recife/PE publicou pregões eletrônicos para cessão de equipamentos de LED para o Carnaval 2026 [C4] e para montagem de shows pirotécnicos para o ciclo carnavalesco e aniversário da cidade em 2026 [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE TACAIMBO - 10091601000100-1-000033/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:10091601000100-1-000033/2025",
+    "document_id": "10091601000100-1-000033/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "10091601000100-1-000033/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DO CABO DE SANTO AGOSTINHO - 11294402000162-1-000009/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:11294402000162-1-000009/2025",
+    "document_id": "11294402000162-1-000009/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "11294402000162-1-000009/2025"
+    ]
+   },
+   {
+    "title": "FUNDACAO DE CULTURA CIDADE DO RECIFE - 11508942000100-1-005255/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:11508942000100-1-005255/2025",
+    "document_id": "11508942000100-1-005255/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "11508942000100-1-005255/2025"
+    ]
+   },
+   {
+    "title": "FUNDACAO DE CULTURA CIDADE DO RECIFE - 11508942000100-1-000008/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:11508942000100-1-000008/2026",
+    "document_id": "11508942000100-1-000008/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "11508942000100-1-000008/2026"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 20.0
+ },
+ {
+  "id": "r14",
+  "status": "answered",
+  "answer": "Os editais de aquisição de pneus publicados no Mato Grosso incluem o registro de preço para pneus novos certificados pelo INMETRO pelo Município de Novo Mundo/MT [C1]. O Município de Tapurah/MT publicou dois pregões eletrônicos para a futura aquisição de pneus destinados às Secretarias de Serviços Públicos e de Infraestrutura e Meio Ambiente [C2][C3]. O Município de Sapezal/MT lançou um pregão eletrônico para a aquisição de pneus e câmaras de ar para toda a frota municipal [C4]. Por fim, o Município de Nova Canaã do Norte/MT publicou um pregão presencial para o registro de preço de pneus, câmaras de ar e protetores para veículos e máquinas [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE NOVO MUNDO - 01614517000133-1-000007/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:01614517000133-1-000007/2025",
+    "document_id": "01614517000133-1-000007/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01614517000133-1-000007/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE TAPURAH - 24772253000141-1-000057/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:24772253000141-1-000057/2024",
+    "document_id": "24772253000141-1-000057/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "24772253000141-1-000057/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE TAPURAH - 24772253000141-1-000053/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:24772253000141-1-000053/2024",
+    "document_id": "24772253000141-1-000053/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "24772253000141-1-000053/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SAPEZAL - 01614225000109-1-000037/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:01614225000109-1-000037/2025",
+    "document_id": "01614225000109-1-000037/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01614225000109-1-000037/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE NOVA CANAA DO NORTE - 03238912000194-1-000024/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:03238912000194-1-000024/2026",
+    "document_id": "03238912000194-1-000024/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "03238912000194-1-000024/2026"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 12.7
+ },
+ {
+  "id": "r15",
+  "status": "answered",
+  "answer": "The context provides five procurement notices for water treatment chemicals, specifically sodium hypochlorite and calcium hypochlorite. COMUSA - Serviços de Água e Esgoto de Novo Hamburgo in Novo Hamburgo, RS, issued notices for the price registration of sodium hypochlorite for water treatment in 2024 [C1] and 2025 [C2]. The Departamento de Água e Esgoto in Bauru, SP, issued notices for the acquisition of special sodium hypochlorite for water treatment in 2024 [C3] and 2025 [C4]. Additionally, the Serviço Autônomo de Água e Esgoto in Casa Nova, BA, issued a 2024 notice for the price registration of chemical products including calcium hypochlorite [C5].\n\nCoverage: PNCP procurement notices (text + vector search), release v1, data through 2026-07-31.",
+  "citations": [
+   {
+    "title": "COMUSA - SERVICOS DE AGUA E ESGOTO DE NOVO HAMBURGO - 09509569000151-1-000061/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:09509569000151-1-000061/2024",
+    "document_id": "09509569000151-1-000061/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "09509569000151-1-000061/2024"
+    ]
+   },
+   {
+    "title": "COMUSA - SERVICOS DE AGUA E ESGOTO DE NOVO HAMBURGO - 09509569000151-1-000079/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:09509569000151-1-000079/2025",
+    "document_id": "09509569000151-1-000079/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "09509569000151-1-000079/2025"
+    ]
+   },
+   {
+    "title": "DEPARTAMENTO DE AGUA E ESGOTO - 46139952000191-1-000186/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:46139952000191-1-000186/2024",
+    "document_id": "46139952000191-1-000186/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "46139952000191-1-000186/2024"
+    ]
+   },
+   {
+    "title": "DEPARTAMENTO DE AGUA E ESGOTO - 46139952000191-1-000226/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:46139952000191-1-000226/2025",
+    "document_id": "46139952000191-1-000226/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "46139952000191-1-000226/2025"
+    ]
+   },
+   {
+    "title": "SERVICO AUTONOMO DE AGUA E ESGOTO - 14759286000106-1-000001/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:14759286000106-1-000001/2024",
+    "document_id": "14759286000106-1-000001/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "14759286000106-1-000001/2024"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 8.7
+ },
+ {
+  "id": "r16",
+  "status": "answered",
+  "answer": "No Rio de Janeiro, a Câmara Municipal de Mangaratiba busca contratar serviços contínuos de manutenção e modernização de solução integrada de segurança [C1]. O Município de Carmo/RJ licita o fornecimento de câmeras de monitoramento e nobreak para a Guarda Civil [C2]. A Câmara Municipal de Paracambi/RJ contrata a substituição, instalação e manutenção de câmeras de segurança e configuração do sistema [C3]. O Estado do Rio de Janeiro adquire materiais como câmeras e cabos para o sistema CFTV do Tribunal de Contas do Município [C4]. O Município de Araruama/RJ realiza registro de preços para aquisição, instalação e manutenção de câmeras de monitoramento [C5].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "CAMARA MUNICIPAL DE MANGARATIBA - 27215946000121-1-000010/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:27215946000121-1-000010/2026",
+    "document_id": "27215946000121-1-000010/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "27215946000121-1-000010/2026"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE CARMO - 29128741000134-1-000021/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:29128741000134-1-000021/2025",
+    "document_id": "29128741000134-1-000021/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "29128741000134-1-000021/2025"
+    ]
+   },
+   {
+    "title": "PARACAMBI CAMARA MUNICIPAL - 30646665000138-1-000021/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:30646665000138-1-000021/2025",
+    "document_id": "30646665000138-1-000021/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "30646665000138-1-000021/2025"
+    ]
+   },
+   {
+    "title": "ESTADO DO RIO DE JANEIRO - 42498600000171-1-000457/2023",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:42498600000171-1-000457/2023",
+    "document_id": "42498600000171-1-000457/2023",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "42498600000171-1-000457/2023"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE ARARUAMA - 28531762000133-1-000093/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:28531762000133-1-000093/2025",
+    "document_id": "28531762000133-1-000093/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "28531762000133-1-000093/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 12.1
+ },
+ {
+  "id": "r17",
+  "status": "answered",
+  "answer": "No Rio Grande do Norte, o Município de Felipe Guerra publicou o edital [C1] para registro de preços visando a aquisição de Gás Liquefeito de Petróleo (GLP) de 13 kg, buscando o maior percentual de desconto sobre a tabela da ANP. O Município de Lagoa de Velhos emitiu dois editais, [C2] e [C3], ambos para registro de preços destinado à futura contratação para aquisição de GLP para atender às secretarias municipais. A Universidade Federal do Rio Grande do Norte (UFRN), em Natal, publicou os editais [C4] e [C5] para a aquisição de GLP, sendo o primeiro para gás evasado e à granel e o segundo exclusivamente para gás à granel, ambos para atender demandas da instituição por 12 meses.\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE FELIPE GUERRA - 08349086000174-1-000044/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:08349086000174-1-000044/2024",
+    "document_id": "08349086000174-1-000044/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "08349086000174-1-000044/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE LAGOA DE VELHOS - 08159162000189-1-000034/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:08159162000189-1-000034/2024",
+    "document_id": "08159162000189-1-000034/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "08159162000189-1-000034/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE LAGOA DE VELHOS - 08159162000189-1-000032/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:08159162000189-1-000032/2024",
+    "document_id": "08159162000189-1-000032/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "08159162000189-1-000032/2024"
+    ]
+   },
+   {
+    "title": "UNIVERSIDADE FEDERAL DO RIO GRANDE DO NORTE - 24365710000183-1-000130/2023",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:24365710000183-1-000130/2023",
+    "document_id": "24365710000183-1-000130/2023",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "24365710000183-1-000130/2023"
+    ]
+   },
+   {
+    "title": "UNIVERSIDADE FEDERAL DO RIO GRANDE DO NORTE - 24365710000183-1-000022/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:24365710000183-1-000022/2024",
+    "document_id": "24365710000183-1-000022/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "24365710000183-1-000022/2024"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 14.4
+ },
+ {
+  "id": "r18",
+  "status": "answered",
+  "answer": "No Pará, o Município de Paragominas/PA realizou pregão presencial para adesão à ARP nº 08/2023, visando a aquisição de ônibus escolares dos tipos ORE 2 e 3 para a frota da Secretaria Municipal de Educação [C2]. O Município de Jacundá/PA também conduziu pregão presencial para adesão a registro de preços destinado ao fornecimento de ônibus escolar rural para sua Secretaria Municipal de Educação [C3]. Além disso, o Município de Mãe do Rio/PA abriu pregão eletrônico para registro de preços de futura aquisição de ônibus escolar médio ORE 2 com capacidade de 44 lugares, seguindo o padrão FNDE [C4].\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE PARAGOMINAS - 05193057000178-1-000180/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:05193057000178-1-000180/2025",
+    "document_id": "05193057000178-1-000180/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "05193057000178-1-000180/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE JACUNDA - 05854633000180-1-000031/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:05854633000180-1-000031/2024",
+    "document_id": "05854633000180-1-000031/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "05854633000180-1-000031/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE MAE DO RIO - 05363023000184-1-000040/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:05363023000184-1-000040/2025",
+    "document_id": "05363023000184-1-000040/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "05363023000184-1-000040/2025"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 15.5
+ },
+ {
+  "id": "r19",
+  "status": "answered",
+  "answer": "Em Goiânia/GO, a Secretaria Municipal de Saúde publicou o edital [C1] para contratação de serviços continuados de limpeza, higienização e conservação de instalações físicas e superfícies hospitalares. No mesmo município, o Ministério da Fazenda lançou o edital [C3] para prestação de serviços de limpeza e conservação com regime de dedicação exclusiva de mão de obra para diversas unidades. Em Santa Helena de Goiás/GO, o Fundo Municipal de Saúde emitiu o edital [C5] para contratação de serviços contínuos de limpeza, higienização e asseio diário, incluindo fornecimento de mão de obra e equipamentos. Os editais [C2] e [C4] não se aplicam, pois tratam do fornecimento de materiais de higiene e limpeza, não de serviços hospitalares.\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "SECRETARIA MUNICIPAL DE SAUDE - 25141524000123-1-000085/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:25141524000123-1-000085/2025",
+    "document_id": "25141524000123-1-000085/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "25141524000123-1-000085/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE SANTA TEREZINHA DE GOIAS - 01137116000130-1-000038/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:01137116000130-1-000038/2024",
+    "document_id": "01137116000130-1-000038/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01137116000130-1-000038/2024"
+    ]
+   },
+   {
+    "title": "MINISTERIO DA FAZENDA - 00394460000141-1-000151/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:00394460000141-1-000151/2024",
+    "document_id": "00394460000141-1-000151/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "00394460000141-1-000151/2024"
+    ]
+   },
+   {
+    "title": "ESTADO DE GOIAS - 01409580000138-1-000930/2026",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:01409580000138-1-000930/2026",
+    "document_id": "01409580000138-1-000930/2026",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01409580000138-1-000930/2026"
+    ]
+   },
+   {
+    "title": "FUNDO MUNICIPAL DE SAUDE - 11315213000129-1-000008/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:11315213000129-1-000008/2024",
+    "document_id": "11315213000129-1-000008/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "11315213000129-1-000008/2024"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 15.0
+ },
+ {
+  "id": "r20",
+  "status": "answered",
+  "answer": "No Piauí, o Município de Porto [C1] e o Município de Piracuruca [C4] realizaram concorrências eletrônicas para contratação de serviços de perfuração de poços artesianos. O Município de Patos do Piauí [C2] e o Município de Paquetá [C5] utilizaram pregões eletrônicos para fornecimento de peças e acessórios e para operacionalização de poços artesianos, respectivamente. O Município de Morro Cabeça no Tempo [C3] também possui uma licitação registrada, embora o objeto específico não esteja totalmente detalhado no contexto fornecido.\n\nCobertura: PNCP procurement notices (text + vector search), versão v1, dados até 2026-07-31.",
+  "citations": [
+   {
+    "title": "MUNICIPIO DE PORTO - 06554414000149-1-000019/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C1:06554414000149-1-000019/2025",
+    "document_id": "06554414000149-1-000019/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "06554414000149-1-000019/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE PATOS DO PIAUI - 41522285000108-1-000009/2025",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C2:41522285000108-1-000009/2025",
+    "document_id": "41522285000108-1-000009/2025",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "41522285000108-1-000009/2025"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE MORRO CABECA NO TEMPO - 01612594000154-1-000001/2022",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C3:01612594000154-1-000001/2022",
+    "document_id": "01612594000154-1-000001/2022",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01612594000154-1-000001/2022"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE PIRACURUCA - 06553887000121-1-000021/2024",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C4:06553887000121-1-000021/2024",
+    "document_id": "06553887000121-1-000021/2024",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "06553887000121-1-000021/2024"
+    ]
+   },
+   {
+    "title": "MUNICIPIO DE PAQUETA - 01612601000118-1-000012/2023",
+    "source_uri": "https://www.kaggle.com/datasets/lucasrangelss/pncp-analytics",
+    "chunk_id": "C5:01612601000118-1-000012/2023",
+    "document_id": "01612601000118-1-000012/2023",
+    "dataset": {
+     "slug": "lucasrangelss/pncp-analytics",
+     "version": 1
+    },
+    "record_ids": [
+     "01612601000118-1-000012/2023"
+    ]
+   }
+  ],
+  "safety_reason": null,
+  "grounded": true,
+  "seconds": 13.4
+ }
+]

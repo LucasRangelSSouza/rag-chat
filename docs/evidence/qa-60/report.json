@@ -1,0 +1,618 @@
+{
+ "summary": {
+  "siope": {
+   "n": 20,
+   "ok": 19
+  },
+  "pncp-sql": {
+   "n": 20,
+   "ok": 18
+  },
+  "pncp": {
+   "n": 20,
+   "ok": 18
+  }
+ },
+ "rows": [
+  {
+   "id": "s01",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 16229.36",
+   "seconds": 9.3,
+   "cached": false
+  },
+  {
+   "id": "s02",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 5565.0",
+   "seconds": 0.8,
+   "cached": false
+  },
+  {
+   "id": "s03",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 18758.97",
+   "seconds": 8.8,
+   "cached": false
+  },
+  {
+   "id": "s04",
+   "base": "siope",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth Vitória",
+   "seconds": 22.5,
+   "cached": false
+  },
+  {
+   "id": "s05",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 9487.32",
+   "seconds": 13.7,
+   "cached": false
+  },
+  {
+   "id": "s06",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 27.0",
+   "seconds": 10.8,
+   "cached": false
+  },
+  {
+   "id": "s07",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 26.63",
+   "seconds": 9.9,
+   "cached": false
+  },
+  {
+   "id": "s08",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 1090579242.2",
+   "seconds": 10.3,
+   "cached": false
+  },
+  {
+   "id": "s09",
+   "base": "siope",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth São Patrício",
+   "seconds": 9.1,
+   "cached": false
+  },
+  {
+   "id": "s10",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 15.0",
+   "seconds": 10.1,
+   "cached": false
+  },
+  {
+   "id": "s11",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 296778658.33",
+   "seconds": 11.8,
+   "cached": false
+  },
+  {
+   "id": "s12",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 16423.22",
+   "seconds": 9.3,
+   "cached": false
+  },
+  {
+   "id": "s13",
+   "base": "siope",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth SP",
+   "seconds": 10.9,
+   "cached": false
+  },
+  {
+   "id": "s14",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 497.0",
+   "seconds": 14.0,
+   "cached": false
+  },
+  {
+   "id": "s15",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 25.83",
+   "seconds": 11.6,
+   "cached": false
+  },
+  {
+   "id": "s16",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 18350.22",
+   "seconds": 10.1,
+   "cached": false
+  },
+  {
+   "id": "s17",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 1499910667.8",
+   "seconds": 13.9,
+   "cached": false
+  },
+  {
+   "id": "s18",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 19328.68",
+   "seconds": 10.9,
+   "cached": false
+  },
+  {
+   "id": "s19",
+   "base": "siope",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth Brasil Novo",
+   "seconds": 12.8,
+   "cached": false
+  },
+  {
+   "id": "s20",
+   "base": "siope",
+   "kind": "number",
+   "status": "answered",
+   "ok": false,
+   "why": "truth 1841.0",
+   "seconds": 13.8,
+   "cached": false
+  },
+  {
+   "id": "c01",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 62774.0",
+   "seconds": 9.8,
+   "cached": false
+  },
+  {
+   "id": "c02",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 2728156317.9",
+   "seconds": 10.3,
+   "cached": false
+  },
+  {
+   "id": "c03",
+   "base": "pncp-sql",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth SC",
+   "seconds": 8.9,
+   "cached": false
+  },
+  {
+   "id": "c04",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": false,
+   "why": "truth 360.0",
+   "seconds": 14.2,
+   "cached": false
+  },
+  {
+   "id": "c05",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 20.0",
+   "seconds": 9.1,
+   "cached": false
+  },
+  {
+   "id": "c06",
+   "base": "pncp-sql",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth São Paulo",
+   "seconds": 11.2,
+   "cached": false
+  },
+  {
+   "id": "c07",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 29656.0",
+   "seconds": 8.5,
+   "cached": false
+  },
+  {
+   "id": "c08",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 29392.0",
+   "seconds": 9.6,
+   "cached": false
+  },
+  {
+   "id": "c09",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 152.0",
+   "seconds": 11.4,
+   "cached": false
+  },
+  {
+   "id": "c10",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 323932.0",
+   "seconds": 20.4,
+   "cached": false
+  },
+  {
+   "id": "c11",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 1108824.07",
+   "seconds": 9.9,
+   "cached": false
+  },
+  {
+   "id": "c12",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 3199.0",
+   "seconds": 8.3,
+   "cached": false
+  },
+  {
+   "id": "c13",
+   "base": "pncp-sql",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth AUTO POSTO SAO JOSE COMBUSTIVEIS EIRELI",
+   "seconds": 13.6,
+   "cached": false
+  },
+  {
+   "id": "c14",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 10477.0",
+   "seconds": 10.3,
+   "cached": false
+  },
+  {
+   "id": "c15",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": false,
+   "why": "truth 328.0",
+   "seconds": 21.9,
+   "cached": false
+  },
+  {
+   "id": "c16",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 418403760.6",
+   "seconds": 12.3,
+   "cached": false
+  },
+  {
+   "id": "c17",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 366.0",
+   "seconds": 10.4,
+   "cached": false
+  },
+  {
+   "id": "c18",
+   "base": "pncp-sql",
+   "kind": "name",
+   "status": "answered",
+   "ok": true,
+   "why": "truth PA",
+   "seconds": 9.4,
+   "cached": false
+  },
+  {
+   "id": "c19",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 3697.0",
+   "seconds": 9.9,
+   "cached": false
+  },
+  {
+   "id": "c20",
+   "base": "pncp-sql",
+   "kind": "number",
+   "status": "answered",
+   "ok": true,
+   "why": "truth 334.0",
+   "seconds": 20.1,
+   "cached": false
+  },
+  {
+   "id": "r01",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 15.0,
+   "cached": false
+  },
+  {
+   "id": "r02",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 15.0,
+   "cached": false
+  },
+  {
+   "id": "r03",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 0.8,
+   "cached": false
+  },
+  {
+   "id": "r04",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 14.2,
+   "cached": false
+  },
+  {
+   "id": "r05",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 17.1,
+   "cached": false
+  },
+  {
+   "id": "r06",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 16.3,
+   "cached": false
+  },
+  {
+   "id": "r07",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 10.4,
+   "cached": false
+  },
+  {
+   "id": "r08",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 14.3,
+   "cached": false
+  },
+  {
+   "id": "r09",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 12.6,
+   "cached": false
+  },
+  {
+   "id": "r10",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 15.5,
+   "cached": false
+  },
+  {
+   "id": "r11",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": false,
+   "why": "5 cited, 4 off target",
+   "seconds": 26.1,
+   "cached": false
+  },
+  {
+   "id": "r12",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": false,
+   "why": "5 cited, 2 off target",
+   "seconds": 14.7,
+   "cached": false
+  },
+  {
+   "id": "r13",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "4 cited, 0 off target",
+   "seconds": 20.0,
+   "cached": false
+  },
+  {
+   "id": "r14",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 12.7,
+   "cached": false
+  },
+  {
+   "id": "r15",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 8.7,
+   "cached": false
+  },
+  {
+   "id": "r16",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 12.1,
+   "cached": false
+  },
+  {
+   "id": "r17",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 14.4,
+   "cached": false
+  },
+  {
+   "id": "r18",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "3 cited, 0 off target",
+   "seconds": 15.5,
+   "cached": false
+  },
+  {
+   "id": "r19",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 15.0,
+   "cached": false
+  },
+  {
+   "id": "r20",
+   "base": "pncp",
+   "kind": "records",
+   "status": "answered",
+   "ok": true,
+   "why": "5 cited, 0 off target",
+   "seconds": 13.4,
+   "cached": false
+  }
+ ]
+}

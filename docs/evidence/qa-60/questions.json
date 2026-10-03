@@ -1,104 +1,679 @@
 [
- {"id": "s01", "bases": ["siope"], "kind": "number", "question": "Qual foi o investimento por aluno de Goiânia em 2023?",
-  "truth_sql": "SELECT round(valor::numeric,2) FROM bi.siope_por_aluno WHERE codigo_municipio IN (SELECT codigo_municipio FROM bi.siope_por_aluno WHERE public.f_unaccent(upper(nome_municipio))='GOIANIA' AND sigla_uf='GO') AND ano=2023"},
- {"id": "s02", "bases": ["siope"], "kind": "number", "question": "Quantos municípios declararam ao SIOPE em 2024?",
-  "truth_sql": "SELECT count(DISTINCT codigo_municipio) FROM bi.siope_por_aluno WHERE ano=2024"},
- {"id": "s03", "bases": ["siope"], "kind": "number", "question": "Qual a mediana do investimento por aluno entre os municípios de Minas Gerais em 2023?",
-  "truth_sql": "SELECT round(percentile_cont(0.5) WITHIN GROUP (ORDER BY valor)::numeric,2) FROM bi.siope_por_aluno WHERE sigla_uf='MG' AND ano=2023"},
- {"id": "s04", "bases": ["siope"], "kind": "name", "question": "Qual capital teve o maior investimento por aluno em 2023?",
-  "truth_sql": "SELECT nome_municipio FROM bi.siope_por_aluno WHERE ano=2023 AND (public.f_unaccent(upper(nome_municipio)),sigla_uf) IN (('RIO BRANCO','AC'),('MACEIO','AL'),('MACAPA','AP'),('MANAUS','AM'),('SALVADOR','BA'),('FORTALEZA','CE'),('BRASILIA','DF'),('VITORIA','ES'),('GOIANIA','GO'),('SAO LUIS','MA'),('CUIABA','MT'),('CAMPO GRANDE','MS'),('BELO HORIZONTE','MG'),('BELEM','PA'),('JOAO PESSOA','PB'),('CURITIBA','PR'),('RECIFE','PE'),('TERESINA','PI'),('RIO DE JANEIRO','RJ'),('NATAL','RN'),('PORTO ALEGRE','RS'),('PORTO VELHO','RO'),('BOA VISTA','RR'),('FLORIANOPOLIS','SC'),('SAO PAULO','SP'),('ARACAJU','SE'),('PALMAS','TO')) ORDER BY valor DESC LIMIT 1"},
- {"id": "s05", "bases": ["siope"], "kind": "number", "question": "Qual a média do investimento por aluno no Nordeste em 2022?",
-  "truth_sql": "SELECT round(avg(valor)::numeric,2) FROM bi.siope_por_aluno WHERE ano=2022 AND sigla_uf IN ('AL','BA','CE','MA','PB','PE','PI','RN','SE')"},
- {"id": "s06", "bases": ["siope"], "kind": "number", "question": "Quantos municípios aplicaram menos de 25% da receita de impostos em educação (MDE) em 2023?",
-  "truth_sql": "SELECT count(*) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='24' AND valor<25"},
- {"id": "s07", "bases": ["siope"], "kind": "number", "question": "Qual percentual da receita de impostos São Paulo aplicou em MDE em 2023?",
-  "truth_sql": "SELECT round(valor::numeric,2) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='24' AND public.f_unaccent(upper(nome_municipio))='SAO PAULO' AND sigla_uf='SP'"},
- {"id": "s08", "bases": ["siope"], "kind": "number", "question": "How much did Recife spend on school transport (subfunction 782) in 2023, amount paid?",
-  "truth_sql": "SELECT round(sum(valor_paga)::numeric,2) FROM siope.despesa_subfuncao_municipio_ano WHERE ano=2023 AND subfuncao LIKE '782%' AND public.f_unaccent(upper(nome_municipio))='RECIFE' AND sigla_uf='PE'"},
- {"id": "s09", "bases": ["siope"], "kind": "name", "question": "Qual município de Goiás teve o maior investimento por aluno em 2024?",
-  "truth_sql": "SELECT nome_municipio FROM bi.siope_por_aluno WHERE ano=2024 AND sigla_uf='GO' ORDER BY valor DESC LIMIT 1"},
- {"id": "s10", "bases": ["siope"], "kind": "number", "question": "Quantos municípios pagaram menos de 70% do FUNDEB aos profissionais da educação em 2023?",
-  "truth_sql": "SELECT count(*) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='67' AND valor<70"},
- {"id": "s11", "bases": ["siope"], "kind": "number", "question": "Qual o total pago em alimentação e nutrição (subfunção 306) pelos municípios do Ceará em 2023?",
-  "truth_sql": "SELECT round(sum(valor_paga)::numeric,2) FROM siope.despesa_subfuncao_municipio_ano WHERE ano=2023 AND subfuncao LIKE '306%' AND sigla_uf='CE'"},
- {"id": "s12", "bases": ["siope"], "kind": "number", "question": "Qual foi o investimento por aluno de Curitiba em 2022?",
-  "truth_sql": "SELECT round(valor::numeric,2) FROM bi.siope_por_aluno WHERE ano=2022 AND public.f_unaccent(upper(nome_municipio))='CURITIBA' AND sigla_uf='PR'"},
- {"id": "s13", "bases": ["siope"], "kind": "name", "question": "Qual estado teve a maior mediana de investimento por aluno em 2023?",
-  "truth_sql": "SELECT sigla_uf FROM bi.siope_por_aluno WHERE ano=2023 GROUP BY sigla_uf ORDER BY percentile_cont(0.5) WITHIN GROUP (ORDER BY valor) DESC LIMIT 1"},
- {"id": "s14", "bases": ["siope"], "kind": "number", "question": "Quantos municípios do Rio Grande do Sul declararam ao SIOPE em 2023?",
-  "truth_sql": "SELECT count(DISTINCT codigo_municipio) FROM bi.siope_por_aluno WHERE ano=2023 AND sigla_uf='RS'"},
- {"id": "s15", "bases": ["siope"], "kind": "number", "question": "Qual o percentual dos gastos de Salvador destinado à educação em 2023 (indicador 35)?",
-  "truth_sql": "SELECT round(valor::numeric,2) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='35' AND public.f_unaccent(upper(nome_municipio))='SALVADOR' AND sigla_uf='BA'"},
- {"id": "s16", "bases": ["siope"], "kind": "number", "question": "What was the average investment per student in Santa Catarina municipalities in 2024?",
-  "truth_sql": "SELECT round(avg(valor)::numeric,2) FROM bi.siope_por_aluno WHERE ano=2024 AND sigla_uf='SC'"},
- {"id": "s17", "bases": ["siope"], "kind": "number", "question": "Quanto Manaus pagou em ensino fundamental (subfunção 361) em 2023?",
-  "truth_sql": "SELECT round(sum(valor_paga)::numeric,2) FROM siope.despesa_subfuncao_municipio_ano WHERE ano=2023 AND subfuncao LIKE '361%' AND public.f_unaccent(upper(nome_municipio))='MANAUS' AND sigla_uf='AM'"},
- {"id": "s18", "bases": ["siope"], "kind": "number", "question": "Qual foi o investimento por aluno de Belo Horizonte em 2024?",
-  "truth_sql": "SELECT round(valor::numeric,2) FROM bi.siope_por_aluno WHERE ano=2024 AND public.f_unaccent(upper(nome_municipio))='BELO HORIZONTE' AND sigla_uf='MG'"},
- {"id": "s19", "bases": ["siope"], "kind": "name", "question": "Qual município do Pará teve o menor investimento por aluno em 2023?",
-  "truth_sql": "SELECT nome_municipio FROM bi.siope_por_aluno WHERE ano=2023 AND sigla_uf='PA' ORDER BY valor ASC LIMIT 1"},
- {"id": "s20", "bases": ["siope"], "kind": "number", "question": "Quantos municípios do Brasil tiveram investimento por aluno acima de 20 mil reais em 2023?",
-  "truth_sql": "SELECT count(*) FROM bi.siope_por_aluno WHERE ano=2023 AND valor>20000"},
-
- {"id": "c01", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos foram assinados em Goiás em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='GO'"},
- {"id": "c02", "bases": ["pncp-sql"], "kind": "number", "question": "Qual o valor total dos contratos de Goiânia em 2024, excluindo valores acima de 1 bilhão?",
-  "truth_sql": "SELECT round(sum(valor_global)::numeric,2) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND public.f_unaccent(upper(nome_municipio))='GOIANIA' AND sigla_uf='GO' AND valor_global<1e9"},
- {"id": "c03", "bases": ["pncp-sql"], "kind": "name", "question": "Qual estado teve mais contratos em 2023?",
-  "truth_sql": "SELECT sigla_uf FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 GROUP BY sigla_uf ORDER BY count(*) DESC LIMIT 1"},
- {"id": "c04", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos de transporte escolar foram assinados na Bahia em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='BA' AND public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%transporte escolar%'))"},
- {"id": "c05", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos de ambulância existem em Minas Gerais em 2023?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND sigla_uf='MG' AND public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%ambulanc%'))"},
- {"id": "c06", "bases": ["pncp-sql"], "kind": "name", "question": "Qual município de São Paulo teve o maior valor contratado em 2024, sem contratos acima de 1 bilhão?",
-  "truth_sql": "SELECT nome_municipio FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='SP' AND valor_global<1e9 GROUP BY nome_municipio ORDER BY sum(valor_global) DESC LIMIT 1"},
- {"id": "c07", "bases": ["pncp-sql"], "kind": "number", "question": "How many contracts were signed in Brazil in 2022?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2022"},
- {"id": "c08", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos municipais (esfera M) o Paraná registrou em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='PR' AND orgao_esfera_id='M'"},
- {"id": "c09", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos de merenda escolar foram assinados no Ceará em 2023?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND sigla_uf='CE' AND (public.f_unaccent(upper(objeto_contrato)) LIKE '%MERENDA%' OR public.f_unaccent(upper(objeto_contrato)) LIKE '%ALIMENTACAO ESCOLAR%' OR public.f_unaccent(upper(objeto_contrato)) LIKE '%PNAE%')"},
- {"id": "c10", "bases": ["pncp-sql"], "kind": "number", "question": "Quantas atas de registro de preço não canceladas existem em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_atas WHERE ano_ata=2024 AND NOT coalesce(cancelado,false)"},
- {"id": "c11", "bases": ["pncp-sql"], "kind": "number", "question": "Qual o valor médio dos contratos de combustível no Mato Grosso em 2024, excluindo acima de 1 bilhão?",
-  "truth_sql": "SELECT round(avg(valor_global)::numeric,2) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='MT' AND valor_global<1e9 AND public.f_unaccent(upper(objeto_contrato)) LIKE '%COMBUST%'"},
- {"id": "c12", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos o Recife assinou em 2023?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND public.f_unaccent(upper(nome_municipio))='RECIFE' AND sigla_uf='PE'"},
- {"id": "c13", "bases": ["pncp-sql"], "kind": "name", "question": "Qual fornecedor teve mais contratos em Goiás em 2024?",
-  "truth_sql": "SELECT nome_razao_social_fornecedor FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='GO' GROUP BY nome_razao_social_fornecedor ORDER BY count(*) DESC LIMIT 1"},
- {"id": "c14", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos federais (esfera F) foram assinados no Distrito Federal em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='DF' AND orgao_esfera_id='F'"},
- {"id": "c15", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos de uniforme escolar foram assinados no Brasil em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND public.f_unaccent(upper(objeto_contrato)) LIKE '%UNIFORME%' AND public.f_unaccent(upper(objeto_contrato)) LIKE '%ESCOLAR%'"},
- {"id": "c16", "bases": ["pncp-sql"], "kind": "number", "question": "What was the total contract value in Porto Alegre in 2023, excluding values above 1 billion BRL?",
-  "truth_sql": "SELECT round(sum(valor_global)::numeric,2) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND public.f_unaccent(upper(nome_municipio))='PORTO ALEGRE' AND sigla_uf='RS' AND valor_global<1e9"},
- {"id": "c17", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos de medicamentos o Piauí registrou em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='PI' AND public.f_unaccent(upper(objeto_contrato)) LIKE '%MEDICAMENTO%'"},
- {"id": "c18", "bases": ["pncp-sql"], "kind": "name", "question": "Qual estado da região Norte teve mais contratos em 2024?",
-  "truth_sql": "SELECT sigla_uf FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf IN ('AC','AM','AP','PA','RO','RR','TO') GROUP BY sigla_uf ORDER BY count(*) DESC LIMIT 1"},
- {"id": "c19", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos do poder legislativo foram assinados em Minas Gerais em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='MG' AND orgao_poder_id='L'"},
- {"id": "c20", "bases": ["pncp-sql"], "kind": "number", "question": "Quantos contratos de software foram assinados em Santa Catarina em 2024?",
-  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='SC' AND (public.f_unaccent(upper(objeto_contrato)) LIKE '%SOFTWARE%' OR public.f_unaccent(upper(objeto_contrato)) LIKE '%SISTEMA DE GESTAO%')"},
-
- {"id": "r01", "bases": ["pncp"], "kind": "records", "question": "Quais editais de transporte escolar existem em Goiás?", "check": {"uf": "GO", "terms": ["TRANSPORTE ESCOLAR"]}},
- {"id": "r02", "bases": ["pncp"], "kind": "records", "question": "Mostre editais de compra de ambulância em Minas Gerais", "check": {"uf": "MG", "terms": ["AMBULANC"]}},
- {"id": "r03", "bases": ["pncp"], "kind": "records", "question": "Which notices are about school uniforms?", "check": {"terms": ["UNIFORME"]}},
- {"id": "r04", "bases": ["pncp"], "kind": "records", "question": "Editais de merenda escolar no Ceará", "check": {"uf": "CE", "terms_any": ["MERENDA", "ALIMENTACAO ESCOLAR", "GENEROS ALIMENTICIOS", "PNAE"]}},
- {"id": "r05", "bases": ["pncp"], "kind": "records", "question": "Licitações para construção de creche na Bahia", "check": {"uf": "BA", "terms_any": ["CRECHE", "EDUCACAO INFANTIL"]}},
- {"id": "r06", "bases": ["pncp"], "kind": "records", "question": "Editais de pavimentação asfáltica no Paraná", "check": {"uf": "PR", "terms_any": ["PAVIMENTA", "ASFALT", "RECAPE"]}},
- {"id": "r07", "bases": ["pncp"], "kind": "records", "question": "Notices for buying computers or notebooks for schools", "check": {"terms_any": ["NOTEBOOK", "COMPUTADOR", "INFORMATICA", "CHROMEBOOK", "TABLET"]}},
- {"id": "r08", "bases": ["pncp"], "kind": "records", "question": "Editais de coleta de lixo em São Paulo (estado)", "check": {"uf": "SP", "terms_any": ["LIXO", "RESIDUO", "COLETA"]}},
- {"id": "r09", "bases": ["pncp"], "kind": "records", "question": "Compra de medicamentos para farmácia básica no Piauí", "check": {"uf": "PI", "terms_any": ["MEDICAMENTO", "FARMAC"]}},
- {"id": "r10", "bases": ["pncp"], "kind": "records", "question": "Editais de iluminação pública com LED em Santa Catarina", "check": {"uf": "SC", "terms_any": ["ILUMINA", "LED", "LUMINARI"]}},
- {"id": "r11", "bases": ["pncp"], "kind": "records", "question": "Licitações de material escolar no Maranhão", "check": {"uf": "MA", "terms_any": ["MATERIAL ESCOLAR", "KIT ESCOLAR", "KITS ESCOLAR"]}},
- {"id": "r12", "bases": ["pncp"], "kind": "records", "question": "Editais para reforma de escolas no Rio Grande do Sul", "check": {"uf": "RS", "terms_any": ["REFORMA", "AMPLIACAO"], "terms_any2": ["ESCOLA", "ESCOLAR", "EDUCACAO"]}},
- {"id": "r13", "bases": ["pncp"], "kind": "records", "question": "Contratação de shows e eventos de carnaval em Pernambuco", "check": {"uf": "PE", "terms_any": ["CARNAVAL", "SHOW", "EVENTO"]}},
- {"id": "r14", "bases": ["pncp"], "kind": "records", "question": "Editais de aquisição de pneus no Mato Grosso", "check": {"uf": "MT", "terms_any": ["PNEU"]}},
- {"id": "r15", "bases": ["pncp"], "kind": "records", "question": "Notices for water treatment chemicals like chlorine", "check": {"terms_any": ["CLORO", "HIPOCLORITO", "TRATAMENTO DE AGUA", "SULFATO DE ALUMINIO"]}},
- {"id": "r16", "bases": ["pncp"], "kind": "records", "question": "Licitações de câmeras de videomonitoramento no Rio de Janeiro", "check": {"uf": "RJ", "terms_any": ["VIDEOMONITORAMENTO", "CAMERA", "CFTV", "MONITORAMENTO"]}},
- {"id": "r17", "bases": ["pncp"], "kind": "records", "question": "Editais de gás de cozinha GLP no Rio Grande do Norte", "check": {"uf": "RN", "terms_any": ["GLP", "GAS DE COZINHA", "GAS LIQUEFEITO", "BOTIJ"]}},
- {"id": "r18", "bases": ["pncp"], "kind": "records", "question": "Compra de ônibus escolar no Pará", "check": {"uf": "PA", "terms_any": ["ONIBUS", "MICROONIBUS", "MICRO-ONIBUS"]}},
- {"id": "r19", "bases": ["pncp"], "kind": "records", "question": "Editais de serviços de limpeza hospitalar em Goiás", "check": {"uf": "GO", "terms_any": ["LIMPEZA", "HIGIENIZACAO", "CONSERVACAO"]}},
- {"id": "r20", "bases": ["pncp"], "kind": "records", "question": "Licitações de poços artesianos no Piauí", "check": {"uf": "PI", "terms_any": ["POCO", "POCOS", "PERFURACAO"]}}
+ {
+  "id": "s01",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual foi o investimento por aluno de Goiânia em 2023?",
+  "truth_sql": "SELECT round(valor::numeric,2) FROM bi.siope_por_aluno WHERE codigo_municipio IN (SELECT codigo_municipio FROM bi.siope_por_aluno WHERE public.f_unaccent(upper(nome_municipio))='GOIANIA' AND sigla_uf='GO') AND ano=2023"
+ },
+ {
+  "id": "s02",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Quantos municípios declararam ao SIOPE em 2024?",
+  "truth_sql": "SELECT count(DISTINCT codigo_municipio) FROM bi.siope_por_aluno WHERE ano=2024"
+ },
+ {
+  "id": "s03",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual a mediana do investimento por aluno entre os municípios de Minas Gerais em 2023?",
+  "truth_sql": "SELECT round(percentile_cont(0.5) WITHIN GROUP (ORDER BY valor)::numeric,2) FROM bi.siope_por_aluno WHERE sigla_uf='MG' AND ano=2023"
+ },
+ {
+  "id": "s04",
+  "bases": [
+   "siope"
+  ],
+  "kind": "name",
+  "question": "Qual capital teve o maior investimento por aluno em 2023?",
+  "truth_sql": "SELECT nome_municipio FROM bi.siope_por_aluno WHERE ano=2023 AND (public.f_unaccent(upper(nome_municipio)),sigla_uf) IN (('RIO BRANCO','AC'),('MACEIO','AL'),('MACAPA','AP'),('MANAUS','AM'),('SALVADOR','BA'),('FORTALEZA','CE'),('BRASILIA','DF'),('VITORIA','ES'),('GOIANIA','GO'),('SAO LUIS','MA'),('CUIABA','MT'),('CAMPO GRANDE','MS'),('BELO HORIZONTE','MG'),('BELEM','PA'),('JOAO PESSOA','PB'),('CURITIBA','PR'),('RECIFE','PE'),('TERESINA','PI'),('RIO DE JANEIRO','RJ'),('NATAL','RN'),('PORTO ALEGRE','RS'),('PORTO VELHO','RO'),('BOA VISTA','RR'),('FLORIANOPOLIS','SC'),('SAO PAULO','SP'),('ARACAJU','SE'),('PALMAS','TO')) ORDER BY valor DESC LIMIT 1"
+ },
+ {
+  "id": "s05",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual a média do investimento por aluno no Nordeste em 2022?",
+  "truth_sql": "SELECT round(avg(valor)::numeric,2) FROM bi.siope_por_aluno WHERE ano=2022 AND sigla_uf IN ('AL','BA','CE','MA','PB','PE','PI','RN','SE')"
+ },
+ {
+  "id": "s06",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Quantos municípios aplicaram menos de 25% da receita de impostos em educação (MDE) em 2023?",
+  "truth_sql": "SELECT count(*) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='24' AND valor<25"
+ },
+ {
+  "id": "s07",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual percentual da receita de impostos São Paulo aplicou em MDE em 2023?",
+  "truth_sql": "SELECT round(valor::numeric,2) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='24' AND public.f_unaccent(upper(nome_municipio))='SAO PAULO' AND sigla_uf='SP'"
+ },
+ {
+  "id": "s08",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "How much did Recife pay for primary education (subfunction 361) in 2023?",
+  "truth_sql": "SELECT round(sum(valor_paga)::numeric,2) FROM siope.despesa_subfuncao_municipio_ano WHERE ano=2023 AND subfuncao LIKE '361%' AND public.f_unaccent(upper(nome_municipio))='RECIFE' AND sigla_uf='PE'"
+ },
+ {
+  "id": "s09",
+  "bases": [
+   "siope"
+  ],
+  "kind": "name",
+  "question": "Qual município de Goiás teve o maior investimento por aluno em 2024?",
+  "truth_sql": "SELECT nome_municipio FROM bi.siope_por_aluno WHERE ano=2024 AND sigla_uf='GO' ORDER BY valor DESC LIMIT 1"
+ },
+ {
+  "id": "s10",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Quantos municípios pagaram menos de 70% do FUNDEB aos profissionais da educação em 2023?",
+  "truth_sql": "SELECT count(*) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='67' AND valor<70"
+ },
+ {
+  "id": "s11",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual o total pago em alimentação e nutrição (subfunção 306) pelos municípios do Ceará em 2023?",
+  "truth_sql": "SELECT round(sum(valor_paga)::numeric,2) FROM siope.despesa_subfuncao_municipio_ano WHERE ano=2023 AND subfuncao LIKE '306%' AND sigla_uf='CE'"
+ },
+ {
+  "id": "s12",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual foi o investimento por aluno de Curitiba em 2022?",
+  "truth_sql": "SELECT round(valor::numeric,2) FROM bi.siope_por_aluno WHERE ano=2022 AND public.f_unaccent(upper(nome_municipio))='CURITIBA' AND sigla_uf='PR'"
+ },
+ {
+  "id": "s13",
+  "bases": [
+   "siope"
+  ],
+  "kind": "name",
+  "question": "Qual estado teve a maior mediana de investimento por aluno em 2023?",
+  "truth_sql": "SELECT sigla_uf FROM bi.siope_por_aluno WHERE ano=2023 GROUP BY sigla_uf ORDER BY percentile_cont(0.5) WITHIN GROUP (ORDER BY valor) DESC LIMIT 1"
+ },
+ {
+  "id": "s14",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Quantos municípios do Rio Grande do Sul declararam ao SIOPE em 2023?",
+  "truth_sql": "SELECT count(DISTINCT codigo_municipio) FROM bi.siope_por_aluno WHERE ano=2023 AND sigla_uf='RS'"
+ },
+ {
+  "id": "s15",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual percentual da receita de impostos Salvador aplicou em MDE em 2023?",
+  "truth_sql": "SELECT round(valor::numeric,2) FROM siope.indicador_municipio_ano WHERE ano=2023 AND codigo_indicador='24' AND public.f_unaccent(upper(nome_municipio))='SALVADOR' AND sigla_uf='BA'"
+ },
+ {
+  "id": "s16",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "What was the average investment per student in Santa Catarina municipalities in 2024?",
+  "truth_sql": "SELECT round(avg(valor)::numeric,2) FROM bi.siope_por_aluno WHERE ano=2024 AND sigla_uf='SC'"
+ },
+ {
+  "id": "s17",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Quanto Manaus pagou em ensino fundamental (subfunção 361) em 2023?",
+  "truth_sql": "SELECT round(sum(valor_paga)::numeric,2) FROM siope.despesa_subfuncao_municipio_ano WHERE ano=2023 AND subfuncao LIKE '361%' AND public.f_unaccent(upper(nome_municipio))='MANAUS' AND sigla_uf='AM'"
+ },
+ {
+  "id": "s18",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Qual foi o investimento por aluno de Belo Horizonte em 2024?",
+  "truth_sql": "SELECT round(valor::numeric,2) FROM bi.siope_por_aluno WHERE ano=2024 AND public.f_unaccent(upper(nome_municipio))='BELO HORIZONTE' AND sigla_uf='MG'"
+ },
+ {
+  "id": "s19",
+  "bases": [
+   "siope"
+  ],
+  "kind": "name",
+  "question": "Qual município do Pará teve o menor investimento por aluno em 2023?",
+  "truth_sql": "SELECT nome_municipio FROM bi.siope_por_aluno WHERE ano=2023 AND sigla_uf='PA' ORDER BY valor ASC LIMIT 1"
+ },
+ {
+  "id": "s20",
+  "bases": [
+   "siope"
+  ],
+  "kind": "number",
+  "question": "Quantos municípios do Brasil tiveram investimento por aluno acima de 20 mil reais em 2023?",
+  "truth_sql": "SELECT count(*) FROM bi.siope_por_aluno WHERE ano=2023 AND valor>20000"
+ },
+ {
+  "id": "c01",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos foram assinados em Goiás em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='GO'"
+ },
+ {
+  "id": "c02",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Qual o valor total dos contratos de Goiânia em 2024, excluindo valores acima de 1 bilhão?",
+  "truth_sql": "SELECT round(sum(valor_global)::numeric,2) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND public.f_unaccent(upper(nome_municipio))='GOIANIA' AND sigla_uf='GO' AND valor_global<1e9"
+ },
+ {
+  "id": "c03",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "name",
+  "question": "Qual estado teve mais contratos em 2023?",
+  "truth_sql": "SELECT sigla_uf FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 GROUP BY sigla_uf ORDER BY count(*) DESC LIMIT 1"
+ },
+ {
+  "id": "c04",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos de transporte escolar foram assinados na Bahia em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='BA' AND public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%transporte escolar%'))"
+ },
+ {
+  "id": "c05",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos de ambulância existem em Minas Gerais em 2023?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND sigla_uf='MG' AND public.f_unaccent(upper(objeto_contrato)) LIKE public.f_unaccent(upper('%ambulanc%'))"
+ },
+ {
+  "id": "c06",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "name",
+  "question": "Qual município de São Paulo teve o maior valor contratado em 2024, sem contratos acima de 1 bilhão?",
+  "truth_sql": "SELECT nome_municipio FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='SP' AND valor_global<1e9 GROUP BY nome_municipio ORDER BY sum(valor_global) DESC LIMIT 1"
+ },
+ {
+  "id": "c07",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "How many contracts were signed in Brazil in 2022?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2022"
+ },
+ {
+  "id": "c08",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos municipais (esfera M) o Paraná registrou em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='PR' AND orgao_esfera_id='M'"
+ },
+ {
+  "id": "c09",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos de merenda escolar foram assinados no Ceará em 2023?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND sigla_uf='CE' AND (public.f_unaccent(upper(objeto_contrato)) LIKE '%MERENDA%' OR public.f_unaccent(upper(objeto_contrato)) LIKE '%ALIMENTACAO ESCOLAR%' OR public.f_unaccent(upper(objeto_contrato)) LIKE '%PNAE%')"
+ },
+ {
+  "id": "c10",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantas atas de registro de preço não canceladas existem em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_atas WHERE ano_ata=2024 AND NOT coalesce(cancelado,false)"
+ },
+ {
+  "id": "c11",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Qual o valor médio dos contratos de combustível no Mato Grosso em 2024, excluindo acima de 1 bilhão?",
+  "truth_sql": "SELECT round(avg(valor_global)::numeric,2) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='MT' AND valor_global<1e9 AND public.f_unaccent(upper(objeto_contrato)) LIKE '%COMBUST%'"
+ },
+ {
+  "id": "c12",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos o Recife assinou em 2023?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND public.f_unaccent(upper(nome_municipio))='RECIFE' AND sigla_uf='PE'"
+ },
+ {
+  "id": "c13",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "name",
+  "question": "Qual fornecedor teve mais contratos em Goiás em 2024?",
+  "truth_sql": "SELECT nome_razao_social_fornecedor FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='GO' GROUP BY nome_razao_social_fornecedor ORDER BY count(*) DESC LIMIT 1"
+ },
+ {
+  "id": "c14",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos federais (esfera F) foram assinados no Distrito Federal em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='DF' AND orgao_esfera_id='F'"
+ },
+ {
+  "id": "c15",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos de uniforme escolar foram assinados no Brasil em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND public.f_unaccent(upper(objeto_contrato)) LIKE '%UNIFORME%' AND public.f_unaccent(upper(objeto_contrato)) LIKE '%ESCOLAR%'"
+ },
+ {
+  "id": "c16",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "What was the total contract value in Porto Alegre in 2023, excluding values above 1 billion BRL?",
+  "truth_sql": "SELECT round(sum(valor_global)::numeric,2) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2023 AND public.f_unaccent(upper(nome_municipio))='PORTO ALEGRE' AND sigla_uf='RS' AND valor_global<1e9"
+ },
+ {
+  "id": "c17",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos de medicamentos o Piauí registrou em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='PI' AND public.f_unaccent(upper(objeto_contrato)) LIKE '%MEDICAMENTO%'"
+ },
+ {
+  "id": "c18",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "name",
+  "question": "Qual estado da região Norte teve mais contratos em 2024?",
+  "truth_sql": "SELECT sigla_uf FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf IN ('AC','AM','AP','PA','RO','RR','TO') GROUP BY sigla_uf ORDER BY count(*) DESC LIMIT 1"
+ },
+ {
+  "id": "c19",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos do poder legislativo foram assinados em Minas Gerais em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='MG' AND orgao_poder_id='L'"
+ },
+ {
+  "id": "c20",
+  "bases": [
+   "pncp-sql"
+  ],
+  "kind": "number",
+  "question": "Quantos contratos de software foram assinados em Santa Catarina em 2024?",
+  "truth_sql": "SELECT count(*) FROM pncp.obt_pncp_contratos WHERE ano_contrato=2024 AND sigla_uf='SC' AND (public.f_unaccent(upper(objeto_contrato)) LIKE '%SOFTWARE%' OR public.f_unaccent(upper(objeto_contrato)) LIKE '%SISTEMA DE GESTAO%')"
+ },
+ {
+  "id": "r01",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Quais editais de transporte escolar existem em Goiás?",
+  "check": {
+   "uf": "GO",
+   "terms": [
+    "TRANSPORTE ESCOLAR"
+   ]
+  }
+ },
+ {
+  "id": "r02",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Mostre editais de compra de ambulância em Minas Gerais",
+  "check": {
+   "uf": "MG",
+   "terms": [
+    "AMBULANC"
+   ]
+  }
+ },
+ {
+  "id": "r03",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Which notices are about school uniforms?",
+  "check": {
+   "terms": [
+    "UNIFORME"
+   ]
+  }
+ },
+ {
+  "id": "r04",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais de merenda escolar no Ceará",
+  "check": {
+   "uf": "CE",
+   "terms_any": [
+    "MERENDA",
+    "ALIMENTACAO ESCOLAR",
+    "GENEROS ALIMENTICIOS",
+    "PNAE"
+   ]
+  }
+ },
+ {
+  "id": "r05",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Licitações para construção de creche na Bahia",
+  "check": {
+   "uf": "BA",
+   "terms_any": [
+    "CRECHE",
+    "EDUCACAO INFANTIL"
+   ]
+  }
+ },
+ {
+  "id": "r06",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais de pavimentação asfáltica no Paraná",
+  "check": {
+   "uf": "PR",
+   "terms_any": [
+    "PAVIMENTA",
+    "ASFALT",
+    "RECAPE"
+   ]
+  }
+ },
+ {
+  "id": "r07",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Notices for buying computers or notebooks for schools",
+  "check": {
+   "terms_any": [
+    "NOTEBOOK",
+    "COMPUTADOR",
+    "INFORMATICA",
+    "CHROMEBOOK",
+    "TABLET"
+   ]
+  }
+ },
+ {
+  "id": "r08",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais de coleta de lixo em São Paulo (estado)",
+  "check": {
+   "uf": "SP",
+   "terms_any": [
+    "LIXO",
+    "RESIDUO",
+    "COLETA"
+   ]
+  }
+ },
+ {
+  "id": "r09",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Compra de medicamentos para farmácia básica no Piauí",
+  "check": {
+   "uf": "PI",
+   "terms_any": [
+    "MEDICAMENTO",
+    "FARMAC"
+   ]
+  }
+ },
+ {
+  "id": "r10",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais de iluminação pública com LED em Santa Catarina",
+  "check": {
+   "uf": "SC",
+   "terms_any": [
+    "ILUMINA",
+    "LED",
+    "LUMINARI"
+   ]
+  }
+ },
+ {
+  "id": "r11",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Licitações de material escolar no Maranhão",
+  "check": {
+   "uf": "MA",
+   "terms_any": [
+    "MATERIAL ESCOLAR",
+    "KIT ESCOLAR",
+    "KITS ESCOLAR"
+   ]
+  }
+ },
+ {
+  "id": "r12",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais para reforma de escolas no Rio Grande do Sul",
+  "check": {
+   "uf": "RS",
+   "terms_any": [
+    "REFORMA",
+    "AMPLIACAO"
+   ],
+   "terms_any2": [
+    "ESCOLA",
+    "ESCOLAR",
+    "EDUCACAO"
+   ]
+  }
+ },
+ {
+  "id": "r13",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Contratação de shows e eventos de carnaval em Pernambuco",
+  "check": {
+   "uf": "PE",
+   "terms_any": [
+    "CARNAVAL",
+    "SHOW",
+    "EVENTO"
+   ]
+  }
+ },
+ {
+  "id": "r14",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais de aquisição de pneus no Mato Grosso",
+  "check": {
+   "uf": "MT",
+   "terms_any": [
+    "PNEU"
+   ]
+  }
+ },
+ {
+  "id": "r15",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Notices for water treatment chemicals like chlorine",
+  "check": {
+   "terms_any": [
+    "CLORO",
+    "HIPOCLORITO",
+    "TRATAMENTO DE AGUA",
+    "SULFATO DE ALUMINIO"
+   ]
+  }
+ },
+ {
+  "id": "r16",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Licitações de câmeras de videomonitoramento no Rio de Janeiro",
+  "check": {
+   "uf": "RJ",
+   "terms_any": [
+    "VIDEOMONITORAMENTO",
+    "CAMERA",
+    "CFTV",
+    "MONITORAMENTO"
+   ]
+  }
+ },
+ {
+  "id": "r17",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais de gás de cozinha GLP no Rio Grande do Norte",
+  "check": {
+   "uf": "RN",
+   "terms_any": [
+    "GLP",
+    "GAS DE COZINHA",
+    "GAS LIQUEFEITO",
+    "BOTIJ"
+   ]
+  }
+ },
+ {
+  "id": "r18",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Compra de ônibus escolar no Pará",
+  "check": {
+   "uf": "PA",
+   "terms_any": [
+    "ONIBUS",
+    "MICROONIBUS",
+    "MICRO-ONIBUS"
+   ]
+  }
+ },
+ {
+  "id": "r19",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Editais de serviços de limpeza hospitalar em Goiás",
+  "check": {
+   "uf": "GO",
+   "terms_any": [
+    "LIMPEZA",
+    "HIGIENIZACAO",
+    "CONSERVACAO"
+   ]
+  }
+ },
+ {
+  "id": "r20",
+  "bases": [
+   "pncp"
+  ],
+  "kind": "records",
+  "question": "Licitações de poços artesianos no Piauí",
+  "check": {
+   "uf": "PI",
+   "terms_any": [
+    "POCO",
+    "POCOS",
+    "PERFURACAO"
+   ]
+  }
+ }
 ]

@@ -81,3 +81,12 @@ A corpus profile pins a Kaggle dataset slug, its version, the release manifest h
 ## License
 
 Apache-2.0 for code and documentation. The corpus retains its source terms; see the dataset cards.
+
+<!-- articles:start -->
+## Articles
+
+- [Vertex AI vs open-source embeddings: which finds more?](https://lucas.rangeltech.net/articles/b1-vertex-vs-open-source-embeddings/)
+- [How to build a RAG agent over your own data](https://lucas.rangeltech.net/articles/b2-rag-agent-over-your-own-data/)
+- [How to build a safe text-to-SQL agent](https://lucas.rangeltech.net/articles/b3-safe-text-to-sql-agent/)
+- [pgvector at a million rows: IVFFlat or HNSW?](https://lucas.rangeltech.net/articles/b4-pgvector-ivfflat-or-hnsw/)
+<!-- articles:end -->

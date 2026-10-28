@@ -4,6 +4,12 @@ RAG Chat is a small, bounded research chat for a versioned public-data corpus. A
 
 The first profile is the **PNCP corpus profile**, built from the semantic layer of the public PNCP Kaggle catalogue (Brazil's national public procurement portal).
 
+## Codebase at a glance
+
+![Code composition](docs/code_composition.png)
+
+Lines of code per language, counted from the repository files (generated and vendored folders excluded).
+
 ## What it proves
 
 - Retrieval and guardrails run before any model call. An out-of-scope question, a prompt-injection attempt, or an oversized request never reaches the model.
